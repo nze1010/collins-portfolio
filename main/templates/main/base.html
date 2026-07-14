@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Collins Tech Empire — Portfolio of Engr. Josiah Collins Chinaza. Electrical Engineer, AI Specialist, and Python/Django Developer.">
+    <title>{% block title %}Collins Tech Empire | Portfolio{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/style.css' %}">
+    <!-- Theme is applied before paint to avoid flash -->
+    <script>
+        (function(){
+            var t=localStorage.getItem('cte-theme');
+            if(!t) t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+            if(t==='dark') document.documentElement.setAttribute('data-theme','dark');
+        })();
+    </script>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <!-- CTE Text-Based Logo -->
+            <a href="{% url 'home' %}" class="logo" aria-label="Collins Tech Empire Home">
+                <span class="logo-mark" title="CTE — Collins Tech Empire" aria-hidden="true"></span>
+                <span class="logo-name">Collins<span>TechEmpire</span></span>
+            </a>
+
+            <!-- Navigation & Theme Toggle -->
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="{% url 'home' %}" class="active-nav">Home</a>
+                <a href="{% url 'skill_list' %}">Skills</a>
+                <a href="{% url 'blog_list' %}">Blog</a>
+                <a href="{% url 'contact' %}">Contact</a>
+
+                <!-- Light/Dark Mode Toggle -->
+                <button id="theme-toggle-btn" class="theme-toggle" aria-label="Toggle light/dark mode" title="Toggle theme">
+                    <span class="icon-sun"  aria-hidden="true">☀️</span>
+                    <span class="icon-moon" aria-hidden="true">🌙</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container page-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; {% now "Y" %} Collins Tech Empire &mdash; Built with Django &amp; ❤️</p>
+        </div>
+    </footer>
+
+    <script src="{% static 'main/script.js' %}" defer></script>
+</body>
+</html>
+

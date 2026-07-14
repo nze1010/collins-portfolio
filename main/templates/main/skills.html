@@ -1,0 +1,36 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Skills | Engr Collins{% endblock %}
+
+{% block content %}
+
+    <div class="page-title">
+        <h1>My Skills</h1>
+        <p>A highlight of my professional capabilities and technical expertise.</p>
+    </div>
+
+    {% if skills %}
+        <div class="skill-grid skill-grid-large">
+            {% for skill in skills %}
+                <div class="skill-card">
+                    {% if skill.icon %}
+                        <img src="{{ skill.icon.url }}" alt="{{ skill.name }}" class="skill-icon">
+                    {% endif %}
+                    <h3>{{ skill.name }}</h3>
+                    {% if skill.description %}
+                        <p class="skill-description">{{ skill.description }}</p>
+                    {% endif %}
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ skill.proficiency }}%;"></div>
+                    </div>
+                    <span class="progress-label">{{ skill.proficiency }}%</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-text">
+            My skills profile is currently being updated. Please check back soon!
+        </p>
+    {% endif %}
+
+{% endblock %}

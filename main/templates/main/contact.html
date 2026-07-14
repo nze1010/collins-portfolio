@@ -1,0 +1,28 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Contact | Engr Collins{% endblock %}
+
+{% block content %}
+
+    <div class="form-page">
+        <h1>Get In Touch</h1>
+        <p>Have a project in mind or just want to say hello? Fill in the form below.</p>
+
+        <form method="post" class="styled-form">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <p class="field-error">{{ field.errors|striptags }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary">Send Message</button>
+        </form>
+    </div>
+
+{% endblock %}

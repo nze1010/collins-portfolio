@@ -1,0 +1,68 @@
+{% extends 'main/base.html' %}
+{% block content %}
+
+<div class="hero-section">
+    <div class="hero-image-wrapper">
+        {% if profile and profile.profile_picture %}
+            <img src="{{ profile.profile_picture.url }}" alt="Collins Profile Picture" class="profile-img">
+        {% else %}
+            <div class="profile-img" style="background: var(--bg-main); display: flex; align-items: center; justify-content: center; font-size: 3rem;">💻</div>
+        {% endif %}
+    </div>
+
+    <div class="hero-text-block">
+        <h1>Hi, I'm <span class="highlight">Engr. Josiah Collins</span></h1>
+        <p class="hero-subtitle">
+            Founder of Collins Tech Empire. Electrical Engineer, AI specialist, and Python/Django Developer passionate about building clean, intelligent, and functional digital solutions.
+        </p>
+        <div class="hero-buttons">
+            <a href="{% url 'blog_list' %}" class="btn btn-primary">Read My Blog</a>
+            <a href="{% url 'contact' %}" class="btn btn-secondary">Get In Touch</a>
+        </div>
+    </div>
+</div>
+
+<section class="section">
+    <div class="section-header">
+        <h2>A Few Skills</h2>
+        <a href="{% url 'skill_list' %}">View all &rarr;</a>
+    </div>
+
+    {% if top_skills %}
+        <div class="skill-grid">
+            {% for skill in top_skills %}
+                <div class="skill-card">
+                    <h3>{{ skill.name }}</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ skill.proficiency }}%;"></div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No skills added yet. Add some from the admin dashboard.</p>
+    {% endif %}
+</section>
+
+<section class="section">
+    <div class="section-header">
+        <h2>Latest Posts</h2>
+        <a href="{% url 'blog_list' %}">View all &rarr;</a>
+    </div>
+
+    {% if latest_posts %}
+        <div class="post-grid">
+            {% for post in latest_posts %}
+                <a href="{% url 'blog_detail' post.pk %}" class="post-card">
+                    <h3>{{ post.title }}</h3>
+                    <p>{{ post.content|truncatewords:20 }}</p>
+                    <div class="post-meta">{{ post.created_at|date:"M d, Y" }}</div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No posts published yet.</p>
+    {% endif %}
+</section>
+
+{% endblock %}

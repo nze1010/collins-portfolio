@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ post.title }} | Engr Collins{% endblock %}
+
+{% block content %}
+
+    <article class="post-detail">
+        <a href="{% url 'blog_list' %}" class="back-link">&larr; Back to all posts</a>
+        <h1>{{ post.title }}</h1>
+        <span class="post-meta">By {{ post.author }} &middot; {{ post.created_at|date:"M d, Y" }}
+            {% if post.updated_at != post.created_at %}(updated {{ post.updated_at|date:"M d, Y" }}){% endif %}
+        </span>
+
+        <div class="post-body">
+            {{ post.content|linebreaks }}
+        </div>
+
+        {% if user.is_staff %}
+            <div class="hero-buttons">
+                <a href="{% url 'blog_update' post.pk %}" class="btn btn-primary">Edit Post</a>
+                <a href="{% url 'blog_delete' post.pk %}" class="btn btn-danger">Delete Post</a>
+            </div>
+        {% endif %}
+
+    </article>
+
+{% endblock %}

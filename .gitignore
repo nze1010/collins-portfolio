@@ -1,0 +1,27 @@
+# Byte-compiled
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Database
+db.sqlite3
+
+# User-uploaded files
+media/
+
+# Environment variables
+.env
+
+# VS Code
+.vscode/
+
+# Static collected files
+staticfiles/
+
+# OS files
+Thumbs.db
+.DS_Store
