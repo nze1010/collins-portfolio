@@ -1,68 +1,242 @@
 {% extends 'main/base.html' %}
-{% block content %}
+{% load static %}
 
-<div class="hero-section">
-    <div class="hero-image-wrapper">
-        {% if profile and profile.profile_picture %}
-            <img src="{{ profile.profile_picture.url }}" alt="Collins Profile Picture" class="profile-img">
+{% block content %}
+<section class="hero" id="home">
+    <div class="hero-technology" aria-hidden="true">
+        <span class="circuit-line circuit-one"></span>
+        <span class="circuit-line circuit-two"></span>
+    </div>
+
+    <div class="shell hero-grid">
+        <div class="hero-copy">
+            <div class="status-badge reveal-text">
+                <span class="status-dot" aria-hidden="true"></span>
+                {{ site_settings.availability_status|default:'Available for multidisciplinary technology projects' }}
+            </div>
+            <p class="eyebrow reveal-text">Engineering intelligence. Creating practical impact.</p>
+            <h1 class="reveal-text">Hi, I’m <span>{{ profile.full_name|default:'Engr. Josiah Collins Chinaza' }}</span></h1>
+            <p class="hero-headline reveal-text">{{ site_settings.hero_headline|default:'Electrical Engineer, AI Professional & Python/Django Developer' }}</p>
+            <p class="hero-intro reveal-text">{{ site_settings.hero_intro }}</p>
+            <div class="hero-actions reveal-text">
+                <a class="button button-primary" href="#projects">
+                    Explore My Work
+                    <svg class="icon" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg>
+                </a>
+                <a class="button button-secondary" href="{% url 'skill_list' %}">View My Skills</a>
+                <a class="button button-ghost" href="#contact">Contact Me</a>
+                {% if profile.resume %}
+                    <a class="button button-ghost" href="{{ profile.resume.url }}" target="_blank" rel="noopener">Download Résumé</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="hero-portrait reveal-card">
+            <div class="portrait-ring">
+                <div class="portrait-frame">
+                    {% if profile and profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" alt="Professional portrait of {{ profile.full_name }}" fetchpriority="high">
+                    {% else %}
+                        <div class="portrait-placeholder" aria-label="Profile image placeholder">
+                            <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-code"></use></svg>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <span class="portrait-caption"><strong>CollinsTechEmpire</strong><small>Technology with practical purpose</small></span>
+        </div>
+    </div>
+</section>
+
+<section class="stats-strip" aria-label="Portfolio statistics">
+    <div class="shell stats-grid">
+        {% for stat in stats %}
+            <div class="stat-item reveal-card">
+                <strong data-counter="{{ stat.value }}">0</strong>
+                <span>{{ stat.label }}</span>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block" id="about">
+    <div class="shell about-grid">
+        <div class="section-intro reveal">
+            <span class="eyebrow">About Me</span>
+            <h2>Engineering Ideas. <span>Building Intelligent Solutions.</span></h2>
+        </div>
+        <div class="about-copy reveal">
+            {% if profile.long_bio %}
+                {{ profile.long_bio|linebreaks }}
+            {% else %}
+                <p>I am an Electrical and Electronics Engineer and multidisciplinary technology professional focused on solving real-world problems through engineering, artificial intelligence, software development, renewable energy, research, and digital innovation.</p>
+                <p>My work connects traditional engineering knowledge with emerging technologies. I design and support electrical and solar systems, develop web applications with Python and Django, explore AI-powered workflows, create technical and educational content, and build digital solutions that improve productivity, communication, and access to information.</p>
+                <p>I am also passionate about African technological development, critical thinking, science education, indigenous knowledge, history, culture, and the responsible application of technology in society.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="shell highlight-grid stagger-grid">
+        <article class="highlight-card glass-card reveal-card"><span class="domain-icon engineering-icon"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-engineering"></use></svg></span><div><h3>Engineering</h3><p>Reliable systems grounded in technical understanding and practical problem solving.</p></div></article>
+        <article class="highlight-card glass-card reveal-card"><span class="domain-icon ai-icon"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-ai-practical"></use></svg></span><div><h3>Artificial Intelligence</h3><p>Purposeful AI workflows that improve research, productivity, and decision support.</p></div></article>
+        <article class="highlight-card glass-card reveal-card"><span class="domain-icon software-icon"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-software"></use></svg></span><div><h3>Software Development</h3><p>Dynamic Django products that connect people, content, and business processes.</p></div></article>
+        <article class="highlight-card glass-card reveal-card"><span class="domain-icon energy-icon"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-renewable"></use></svg></span><div><h3>Renewable Energy</h3><p>Solar and electrical solutions designed around real energy needs.</p></div></article>
+        <article class="highlight-card glass-card reveal-card"><span class="domain-icon research-icon"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-research"></use></svg></span><div><h3>Research & Writing</h3><p>Clear technical communication and multidisciplinary analysis.</p></div></article>
+        <article class="highlight-card glass-card reveal-card"><span class="domain-icon creative-icon"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-creative"></use></svg></span><div><h3>Digital Creativity</h3><p>Visual, written, and video content shaped for meaningful communication.</p></div></article>
+    </div>
+</section>
+
+<section class="section-block section-tinted" id="skills">
+    <div class="shell">
+        <div class="section-heading reveal">
+            <div><span class="eyebrow">Core Skills</span><h2>A multidisciplinary <span>capability stack</span></h2></div>
+            <a class="text-link" href="{% url 'skill_list' %}">Explore all skills <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a>
+        </div>
+        <div class="skills-grid stagger-grid">
+            {% for skill in top_skills %}
+                <article class="skill-card glass-card reveal-card">
+                    <div class="card-icon" data-icon="{{ skill.icon_name|default:'software' }}">
+                        {% if skill.icon %}<img src="{{ skill.icon.url }}" alt="" loading="lazy">{% else %}<svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-{{ skill.icon_name|default:'code' }}"></use></svg>{% endif %}
+                    </div>
+                    <span class="skill-category">{{ skill.get_category_display|default:'Technology' }}</span>
+                    <h3>{{ skill.name }}</h3>
+                    <p>{{ skill.description|truncatewords:24 }}</p>
+                    {% if skill.proficiency is not None %}
+                        <div class="skill-meter" aria-label="{{ skill.name }} proficiency: {{ skill.proficiency }} percent">
+                            <span class="skill-meter-label"><span>Proficiency</span><strong>{{ skill.proficiency }}%</strong></span>
+                            <span class="skill-meter-track"><span class="skill-meter-fill" style="--progress: {{ skill.proficiency }}%"></span></span>
+                        </div>
+                    {% endif %}
+                </article>
+            {% empty %}
+                <p class="empty-state">Skills are being prepared in the admin dashboard.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section-block" id="projects">
+    <div class="shell">
+        <div class="section-heading reveal">
+            <div><span class="eyebrow">Featured Projects</span><h2>Ideas translated into <span>working systems</span></h2></div>
+            <a class="text-link" href="{% url 'project_list' %}">View project archive <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a>
+        </div>
+        <div class="project-grid stagger-grid">
+            {% for project in featured_projects %}{% include 'main/partials/project_card.html' %}{% empty %}<p class="empty-state">Project case studies are being documented.</p>{% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if featured_work %}
+<section class="section-block work-gallery-section" id="creative-work">
+    <div class="shell">
+        <div class="section-heading reveal"><div><span class="eyebrow">Creative Work</span><h2>Visual ideas shaped into <span>finished work</span></h2></div><a class="text-link" href="{% url 'project_list' %}#gallery">Explore the gallery <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a></div>
+        <div class="work-gallery work-gallery-home stagger-grid">{% for sample in featured_work %}{% include 'main/partials/work_sample_card.html' %}{% endfor %}</div>
+    </div>
+</section>
+{% endif %}
+
+<section class="section-block section-tinted" id="services">
+    <div class="shell">
+        <div class="section-heading centered reveal"><div><span class="eyebrow">Professional Services</span><h2>Technical capability for <span>meaningful outcomes</span></h2><p>Focused support across engineering, software, artificial intelligence, research, and digital communication.</p></div></div>
+        <div class="services-grid stagger-grid">
+            {% for service in services %}
+                <article class="service-card glass-card reveal-card">
+                    <div class="card-icon" data-icon="{{ service.icon_name|default:'software' }}"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-{{ service.icon_name|default:'software' }}"></use></svg></div>
+                    <h3>{{ service.title }}</h3>
+                    <p>{{ service.description }}</p>
+                    <a href="{% url 'contact' %}?service={{ service.title|urlencode }}" class="text-link">Discuss this service <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a>
+                </article>
+            {% empty %}<p class="empty-state">Service information is being updated.</p>{% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section-block" id="toolkit">
+    <div class="shell toolkit-layout">
+        <div class="section-intro reveal"><span class="eyebrow">Technology Toolkit</span><h2>Tools used to <span>design, build, and deliver</span></h2><p>A focused toolkit backed by practical workflows—not a catalogue of buzzwords.</p></div>
+        <div class="toolkit-grid stagger-grid">
+            {% for item in toolkit_items %}
+                {% if item.url %}<a href="{{ item.url }}" target="_blank" rel="noopener" class="tool-item glass-card reveal-card" data-icon="{{ item.icon_name }}">{% else %}<div class="tool-item glass-card reveal-card" data-icon="{{ item.icon_name }}">{% endif %}
+                    <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-{{ item.icon_name|default:'code' }}"></use></svg>
+                    <span><strong>{{ item.name }}</strong><small>{{ item.category }}</small></span>
+                {% if item.url %}</a>{% else %}</div>{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section-block section-tinted" id="certifications">
+    <div class="shell">
+        <div class="section-heading reveal"><div><span class="eyebrow">Professional Journey</span><h2>Experience backed by <span>continuous development</span></h2></div><a class="text-link" href="{% url 'journey' %}">Explore my journey <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a></div>
+        {% if experiences %}
+            <div class="experience-preview stagger-grid">
+                {% for experience in experiences %}
+                    <article class="experience-preview-card glass-card reveal-card">
+                        {% if experience.display_period %}<span class="experience-period">{{ experience.display_period }}</span>{% endif %}
+                        <h3>{{ experience.role }}</h3>
+                        <p>{{ experience.company_name }}</p>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if certifications %}
+            <div class="certification-grid stagger-grid">
+                {% for certification in certifications %}
+                    <article class="certification-card glass-card reveal-card">
+                        {% if certification.image %}<img class="certification-thumb" src="{{ certification.image.url }}" alt="{{ certification.title }} certificate" loading="lazy">{% else %}<span class="certification-mark"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-award"></use></svg></span>{% endif %}
+                        <div><span class="eyebrow">{{ certification.issuer|default:'Professional development' }}</span><h3>{{ certification.title }}</h3><p>{{ certification.description }}</p>{% if certification.date_earned %}<time>{{ certification.date_earned|date:'Y' }}</time>{% endif %}</div>
+                    </article>
+                {% endfor %}
+            </div>
         {% else %}
-            <div class="profile-img" style="background: var(--bg-main); display: flex; align-items: center; justify-content: center; font-size: 3rem;">💻</div>
+            <div class="curation-note glass-card reveal"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-award"></use></svg><div><h3>Certification records</h3></div></div>
         {% endif %}
     </div>
+</section>
 
-    <div class="hero-text-block">
-        <h1>Hi, I'm <span class="highlight">Engr. Josiah Collins</span></h1>
-        <p class="hero-subtitle">
-            Founder of Collins Tech Empire. Electrical Engineer, AI specialist, and Python/Django Developer passionate about building clean, intelligent, and functional digital solutions.
-        </p>
-        <div class="hero-buttons">
-            <a href="{% url 'blog_list' %}" class="btn btn-primary">Read My Blog</a>
-            <a href="{% url 'contact' %}" class="btn btn-secondary">Get In Touch</a>
+<section class="section-block" id="research">
+    <div class="shell research-grid">
+        <div class="section-intro reveal"><span class="eyebrow">Research & Interests</span><h2>Technology understood in its <span>human context</span></h2><p>My interests connect technical progress with culture, history, critical inquiry, public communication, and African development.</p></div>
+        <div class="interest-cloud reveal" aria-label="Research interests">
+            {% for interest in research_interests %}<span>{{ interest }}</span>{% endfor %}
         </div>
     </div>
-</div>
+</section>
 
-<section class="section">
-    <div class="section-header">
-        <h2>A Few Skills</h2>
-        <a href="{% url 'skill_list' %}">View all &rarr;</a>
+<section class="section-block section-tinted" id="insights">
+    <div class="shell">
+        <div class="section-heading reveal"><div><span class="eyebrow">Latest Insights</span><h2>Ideas, analysis, and <span>technical perspective</span></h2></div><a class="text-link" href="{% url 'blog_list' %}">Explore the blog <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a></div>
+        <div class="article-grid stagger-grid">
+            {% for post in latest_posts %}{% include 'main/partials/blog_card.html' %}{% empty %}<p class="empty-state">The first CollinsTechEmpire insight is being prepared.</p>{% endfor %}
+        </div>
     </div>
+</section>
 
-    {% if top_skills %}
-        <div class="skill-grid">
-            {% for skill in top_skills %}
-                <div class="skill-card">
-                    <h3>{{ skill.name }}</h3>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ skill.proficiency }}%;"></div>
+<section class="section-block contact-section" id="contact">
+    <div class="shell contact-grid">
+        <div class="contact-copy reveal">
+            <span class="eyebrow">Contact</span>
+            <h2>Let’s Build <span>Something Meaningful</span></h2>
+            <p>I am open to engineering projects, renewable-energy solutions, Django development, artificial-intelligence collaborations, research opportunities, technical writing, creative digital projects, and professional partnerships.</p>
+            <div class="contact-points">
+                <span><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-check"></use></svg> Clear, professional communication</span>
+                <span><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-check"></use></svg> Multidisciplinary technical perspective</span>
+                <span><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-check"></use></svg> Practical, outcome-focused collaboration</span>
+            </div>
+        </div>
+        <form method="post" action="{% url 'contact' %}" class="contact-form glass-card reveal-card">
+            {% csrf_token %}
+            <div class="form-grid">
+                {% for field in contact_form %}
+                    <div class="form-group {% if field.name == 'message' or field.name == 'subject' %}form-group-wide{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<span class="field-error">{{ field.errors|striptags }}</span>{% endif %}
                     </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>No skills added yet. Add some from the admin dashboard.</p>
-    {% endif %}
-</section>
-
-<section class="section">
-    <div class="section-header">
-        <h2>Latest Posts</h2>
-        <a href="{% url 'blog_list' %}">View all &rarr;</a>
+                {% endfor %}
+            </div>
+            <button class="button button-primary" type="submit">Send Message <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></button>
+        </form>
     </div>
-
-    {% if latest_posts %}
-        <div class="post-grid">
-            {% for post in latest_posts %}
-                <a href="{% url 'blog_detail' post.pk %}" class="post-card">
-                    <h3>{{ post.title }}</h3>
-                    <p>{{ post.content|truncatewords:20 }}</p>
-                    <div class="post-meta">{{ post.created_at|date:"M d, Y" }}</div>
-                </a>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>No posts published yet.</p>
-    {% endif %}
 </section>
-
 {% endblock %}

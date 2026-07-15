@@ -1,0 +1,38 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Work | CollinsTechEmpire{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="shell page-hero-content reveal">
+        <span class="eyebrow">Selected Work</span>
+        <h1>Ideas presented through <span>projects and visual work</span></h1>
+        <p>Case studies, graphic design, video production, engineering work, branding, and technology solutions presented in one professional archive.</p>
+    </div>
+</section>
+
+<section class="section-block page-section">
+    <div class="shell">
+        {% if categories %}
+            <div class="filter-bar reveal" data-filter-target="#project-grid" role="group" aria-label="Filter projects by category">
+                <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">All projects</button>
+                {% for category in categories %}<button class="filter-button" type="button" data-filter="{{ category|slugify }}" aria-pressed="false">{{ category }}</button>{% endfor %}
+            </div>
+        {% endif %}
+        <div class="project-grid stagger-grid" id="project-grid">
+            {% for project in projects %}<div data-category="{{ project.category|slugify }}">{% include 'main/partials/project_card.html' %}</div>{% empty %}<div class="empty-state glass-card"><h2>Case studies are being documented</h2><p>Projects added through the admin dashboard will appear here.</p></div>{% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if work_samples %}
+<section class="section-block work-gallery-section" id="gallery">
+    <div class="shell">
+        <div class="section-heading reveal"><div><span class="eyebrow">Visual Work Gallery</span><h2>Designs, videos, and <span>finished creative work</span></h2><p>Click any image to inspect the work in a larger presentation.</p></div></div>
+        {% if work_categories %}<div class="filter-bar reveal" data-filter-target="#work-gallery" role="group" aria-label="Filter visual work by category"><button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">All work</button>{% for category in work_categories %}<button class="filter-button" type="button" data-filter="{{ category.key }}" aria-pressed="false">{{ category.label }}</button>{% endfor %}</div>{% endif %}
+        <div class="work-gallery stagger-grid" id="work-gallery">{% for sample in work_samples %}{% include 'main/partials/work_sample_card.html' %}{% endfor %}</div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

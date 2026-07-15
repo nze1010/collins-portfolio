@@ -1,0 +1,45 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} | CollinsTechEmpire{% endblock %}
+
+{% block content %}
+<article>
+    <header class="project-detail-hero">
+        <div class="shell project-detail-grid">
+            <div class="reveal">
+                <a class="back-link" href="{% url 'project_list' %}"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg> Project archive</a>
+                <span class="eyebrow">{{ project.category }}</span>
+                <h1>{{ project.title }}</h1>
+                <p>{{ project.short_description }}</p>
+                <div class="hero-actions">
+                    {% if project.live_url %}<a class="button button-primary" href="{{ project.live_url }}" target="_blank" rel="noopener">View live project <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-external"></use></svg></a>{% endif %}
+                    {% if project.github_url %}<a class="button button-secondary" href="{{ project.github_url }}" target="_blank" rel="noopener"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-github"></use></svg> View source</a>{% endif %}
+                </div>
+            </div>
+            <div class="project-detail-visual glass-card reveal-card">
+                {% if project.image %}<img src="{{ project.image.url }}" alt="{{ project.title }} preview">{% else %}<span class="project-visual-grid"></span><svg class="icon project-fallback-icon"><use href="{% static 'main/icons.svg' %}#icon-code"></use></svg>{% endif %}
+            </div>
+        </div>
+    </header>
+
+    <section class="section-block page-section">
+        <div class="shell project-story-grid">
+            <div class="prose reveal">
+                <span class="eyebrow">Project Overview</span>
+                <h2>Purpose, implementation, and value</h2>
+                {{ project.details|default:project.short_description|linebreaks }}
+            </div>
+            <aside class="project-facts glass-card reveal-card">
+                <h2>Technology stack</h2>
+                <div class="tag-list">{% for technology in project.technology_list %}<span>{{ technology }}</span>{% empty %}<span>Details being documented</span>{% endfor %}</div>
+                <dl><div><dt>Category</dt><dd>{{ project.category }}</dd></div><div><dt>Last updated</dt><dd>{{ project.updated_at|date:'M Y' }}</dd></div></dl>
+            </aside>
+        </div>
+    </section>
+
+    {% if related_projects %}
+        <section class="section-block section-tinted"><div class="shell"><div class="section-heading"><div><span class="eyebrow">Related Work</span><h2>Explore similar <span>projects</span></h2></div></div><div class="project-grid">{% for project in related_projects %}{% include 'main/partials/project_card.html' %}{% endfor %}</div></div></section>
+    {% endif %}
+</article>
+{% endblock %}

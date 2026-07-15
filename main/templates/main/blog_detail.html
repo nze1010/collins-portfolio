@@ -1,27 +1,27 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
-{% block title %}{{ post.title }} | Engr Collins{% endblock %}
+{% block title %}{{ post.title }} | CollinsTechEmpire{% endblock %}
 
 {% block content %}
-
-    <article class="post-detail">
-        <a href="{% url 'blog_list' %}" class="back-link">&larr; Back to all posts</a>
-        <h1>{{ post.title }}</h1>
-        <span class="post-meta">By {{ post.author }} &middot; {{ post.created_at|date:"M d, Y" }}
-            {% if post.updated_at != post.created_at %}(updated {{ post.updated_at|date:"M d, Y" }}){% endif %}
-        </span>
-
-        <div class="post-body">
-            {{ post.content|linebreaks }}
+<article class="article-detail">
+    <header class="article-detail-header">
+        <div class="shell article-header-inner reveal">
+            <a class="back-link" href="{% url 'blog_list' %}"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg> All insights</a>
+            <span class="eyebrow">{{ post.category }}</span>
+            <h1>{{ post.title }}</h1>
+            {% if post.excerpt %}<p class="article-deck">{{ post.excerpt }}</p>{% endif %}
+            <div class="article-byline"><span>By {{ post.author }}</span><time datetime="{{ post.created_at|date:'Y-m-d' }}">{{ post.created_at|date:'F d, Y' }}</time><span>{{ post.reading_time }} min read</span></div>
         </div>
+    </header>
 
-        {% if user.is_staff %}
-            <div class="hero-buttons">
-                <a href="{% url 'blog_update' post.pk %}" class="btn btn-primary">Edit Post</a>
-                <a href="{% url 'blog_delete' post.pk %}" class="btn btn-danger">Delete Post</a>
-            </div>
-        {% endif %}
+    {% if post.cover_image %}<div class="shell article-cover reveal-card"><img src="{{ post.cover_image.url }}" alt="Cover image for {{ post.title }}"></div>{% endif %}
 
-    </article>
+    <div class="shell article-layout">
+        <div class="article-body prose reveal">{{ post.content|linebreaks }}</div>
+        <aside class="share-panel glass-card reveal-card"><span>Share this insight</span><a target="_blank" rel="noopener" href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri|urlencode }}">LinkedIn</a><a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ post.title|urlencode }}">X / Twitter</a><button type="button" data-copy-url="{{ request.build_absolute_uri }}">Copy link</button></aside>
+    </div>
 
+    {% if related_posts %}<section class="section-block section-tinted"><div class="shell"><div class="section-heading"><div><span class="eyebrow">Continue Reading</span><h2>Related <span>insights</span></h2></div></div><div class="article-grid">{% for post in related_posts %}{% include 'main/partials/blog_card.html' %}{% endfor %}</div></div></section>{% endif %}
+</article>
 {% endblock %}

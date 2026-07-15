@@ -1,34 +1,37 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
-{% block title %}Blog | Engr Collins{% endblock %}
+{% block title %}Insights | CollinsTechEmpire{% endblock %}
 
 {% block content %}
-
-    <div class="page-title-row" style="display: flex; justify-content: space-between; align-items: center; max-width: 900px; margin: 3rem auto; padding: 0 2rem;">
-        <div class="page-title">
-            <h1 style="color: var(--text-primary); font-size: 2.5rem; margin-bottom: 0.5rem;">Blog</h1>
-            <p style="color: var(--text-secondary);">Thoughts, notes and updates.</p>
-        </div>
-        {% if user.is_staff %}
-            <a href="{% url 'blog_create' %}" class="btn btn-primary">New Post</a>
-        {% endif %}
+<section class="page-hero compact-hero">
+    <div class="shell page-hero-content reveal">
+        <span class="eyebrow">CollinsTechEmpire Insights</span>
+        <h1>Technical ideas with <span>context and purpose</span></h1>
+        <p>Writing on artificial intelligence, Python and Django, electrical engineering, renewable energy, African innovation, history, culture, and critical thinking.</p>
     </div>
+</section>
 
-    {% if posts %}
-        <div class="post-grid" style="max-width: 900px; margin: 0 auto; padding: 0 2rem;">
-            {% for post in posts %}
-                <div class="post-card">
-                    <a href="{% url 'blog_detail' post.pk %}" style="text-decoration: none;"><h3>{{ post.title }}</h3></a>
-                    <p>{{ post.content|truncatewords:25 }}</p>
-                    <div class="post-meta">By {{ post.author }} &middot; {{ post.created_at|date:"M d, Y" }}</div>
-                </div>
-            {% endfor %}
+<section class="section-block page-section">
+    <div class="shell">
+        <form class="article-search glass-card reveal" method="get" role="search">
+            <label for="article-query">Search articles</label>
+            <div class="search-input-wrap"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-search"></use></svg><input id="article-query" type="search" name="q" value="{{ query }}" placeholder="Search by title, topic, or keyword"></div>
+            <select name="category" aria-label="Filter by article category"><option value="">All topics</option>{% for category in categories %}<option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>{{ category }}</option>{% endfor %}</select>
+            <button class="button button-primary" type="submit">Search</button>
+        </form>
+
+        {% if featured_post and not query and not selected_category %}
+            <article class="featured-article glass-card reveal-card">
+                {% if featured_post.cover_image %}<img src="{{ featured_post.cover_image.url }}" alt="Cover for {{ featured_post.title }}">{% else %}<div class="featured-article-visual"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-document"></use></svg></div>{% endif %}
+                <div><span class="eyebrow">Featured · {{ featured_post.category }}</span><h2><a href="{% url 'blog_detail' featured_post.pk %}">{{ featured_post.title }}</a></h2><p>{{ featured_post.excerpt|default:featured_post.content|truncatewords:40 }}</p><div class="article-meta"><span>{{ featured_post.created_at|date:'M d, Y' }}</span><span>{{ featured_post.reading_time }} min read</span></div><a class="text-link" href="{% url 'blog_detail' featured_post.pk %}">Read featured article <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a></div>
+            </article>
+        {% endif %}
+
+        <div class="section-heading article-results-heading reveal"><div><span class="eyebrow">Article Library</span><h2>{% if query or selected_category %}Search results{% else %}Latest published insights{% endif %}</h2></div></div>
+        <div class="article-grid stagger-grid">
+            {% for post in posts %}{% include 'main/partials/blog_card.html' %}{% empty %}<div class="empty-state glass-card"><h2>No articles found</h2><p>Try a different search or return to all topics.</p></div>{% endfor %}
         </div>
-    {% else %}
-        <p class="empty-text">
-            No blog posts yet.
-            {% if user.is_staff %}<a href="{% url 'blog_create' %}">Write the first one</a>.{% endif %}
-        </p>
-    {% endif %}
-
+    </div>
+</section>
 {% endblock %}

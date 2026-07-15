@@ -1,36 +1,46 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
-{% block title %}Skills | Engr Collins{% endblock %}
+{% block title %}Skills | CollinsTechEmpire{% endblock %}
 
 {% block content %}
-
-    <div class="page-title">
-        <h1>My Skills</h1>
-        <p>A highlight of my professional capabilities and technical expertise.</p>
+<section class="page-hero compact-hero">
+    <div class="shell page-hero-content reveal">
+        <span class="eyebrow">Professional Capabilities</span>
+        <h1>Skills built across <span>engineering and digital technology</span></h1>
+        <p>A multidisciplinary capability base spanning artificial intelligence, software, electrical systems, renewable energy, research, communication, and digital production.</p>
     </div>
+</section>
 
-    {% if skills %}
-        <div class="skill-grid skill-grid-large">
+<section class="section-block page-section">
+    <div class="shell">
+        {% if categories %}
+            <div class="filter-bar reveal" data-filter-target="#skill-grid" role="group" aria-label="Filter skills by category">
+                <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">All skills</button>
+                {% for category in categories %}<button class="filter-button" type="button" data-filter="{{ category.key }}" aria-pressed="false">{{ category.label }}</button>{% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="skills-grid skills-grid-full stagger-grid" id="skill-grid">
             {% for skill in skills %}
-                <div class="skill-card">
-                    {% if skill.icon %}
-                        <img src="{{ skill.icon.url }}" alt="{{ skill.name }}" class="skill-icon">
-                    {% endif %}
-                    <h3>{{ skill.name }}</h3>
-                    {% if skill.description %}
-                        <p class="skill-description">{{ skill.description }}</p>
-                    {% endif %}
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ skill.proficiency }}%;"></div>
+                <article class="skill-card glass-card reveal-card" data-category="{{ skill.category|default:'other' }}">
+                    <div class="card-icon" data-icon="{{ skill.icon_name|default:'software' }}">
+                        {% if skill.icon %}<img src="{{ skill.icon.url }}" alt="" loading="lazy">{% else %}<svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-{{ skill.icon_name|default:'code' }}"></use></svg>{% endif %}
                     </div>
-                    <span class="progress-label">{{ skill.proficiency }}%</span>
-                </div>
+                    <span class="skill-category">{{ skill.get_category_display|default:'Professional capability' }}</span>
+                    <h2>{{ skill.name }}</h2>
+                    <p class="skill-description">{{ skill.description }}</p>
+                    {% if skill.proficiency is not None %}
+                        <div class="skill-meter" aria-label="{{ skill.name }} proficiency: {{ skill.proficiency }} percent">
+                            <span class="skill-meter-label"><span>Proficiency</span><strong>{{ skill.proficiency }}%</strong></span>
+                            <span class="skill-meter-track"><span class="skill-meter-fill" style="--progress: {{ skill.proficiency }}%"></span></span>
+                        </div>
+                    {% endif %}
+                </article>
+            {% empty %}
+                <div class="empty-state glass-card"><h2>Skills are being updated</h2><p>New capabilities will appear here when added through the admin dashboard.</p></div>
             {% endfor %}
         </div>
-    {% else %}
-        <p class="empty-text">
-            My skills profile is currently being updated. Please check back soon!
-        </p>
-    {% endif %}
-
+    </div>
+</section>
 {% endblock %}

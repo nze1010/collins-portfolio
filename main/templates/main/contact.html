@@ -1,28 +1,47 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
-{% block title %}Contact | Engr Collins{% endblock %}
+{% block title %}Contact | CollinsTechEmpire{% endblock %}
 
 {% block content %}
+<section class="page-hero compact-hero">
+    <div class="shell page-hero-content reveal">
+        <span class="eyebrow">Start a Conversation</span>
+        <h1>Let’s Build <span>Something Meaningful</span></h1>
+        <p>I am open to engineering projects, renewable-energy solutions, Django development, AI collaborations, research opportunities, technical writing, creative digital projects, and professional partnerships.</p>
+    </div>
+</section>
 
-    <div class="form-page">
-        <h1>Get In Touch</h1>
-        <p>Have a project in mind or just want to say hello? Fill in the form below.</p>
-
-        <form method="post" class="styled-form">
+<section class="section-block page-section">
+    <div class="shell contact-page-grid">
+        <aside class="contact-sidebar reveal">
+            <span class="eyebrow">Areas of collaboration</span>
+            <h2>Bring a challenge, idea, or opportunity</h2>
+            <p>Select the area that best describes your enquiry. Your message is stored securely in the portfolio admin dashboard for a professional response.</p>
+            <div class="contact-category-list">
+                <span><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-circuit"></use></svg> Engineering consultation</span>
+                <span><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-solar"></use></svg> Solar and electrical services</span>
+                <span><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-code"></use></svg> Django development</span>
+                <span><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-ai"></use></svg> AI collaboration</span>
+                <span><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-document"></use></svg> Research and writing</span>
+                <span><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-design"></use></svg> Design and digital content</span>
+            </div>
+        </aside>
+        <form method="post" class="contact-form glass-card reveal-card" novalidate>
             {% csrf_token %}
-
-            {% for field in form %}
-                <div class="form-group">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <p class="field-error">{{ field.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-            {% endfor %}
-
-            <button type="submit" class="btn btn-primary">Send Message</button>
+            {% if form.non_field_errors %}<div class="field-error form-error">{{ form.non_field_errors|striptags }}</div>{% endif %}
+            <div class="form-grid">
+                {% for field in form %}
+                    <div class="form-group {% if field.name == 'message' or field.name == 'subject' %}form-group-wide{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                        {% if field.errors %}<span class="field-error" role="alert">{{ field.errors|striptags }}</span>{% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="button button-primary">Send Message <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></button>
         </form>
     </div>
-
+</section>
 {% endblock %}

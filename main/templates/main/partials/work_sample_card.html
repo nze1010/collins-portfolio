@@ -1,0 +1,23 @@
+{% load static %}
+<article class="work-sample-card glass-card reveal-card" data-category="{{ sample.category }}">
+    <button
+        class="work-sample-preview"
+        type="button"
+        data-gallery-open
+        data-image="{{ sample.image.url }}"
+        data-title="{{ sample.title }}"
+        data-description="{{ sample.description|default:'' }}"
+        aria-label="Open a larger preview of {{ sample.title }}"
+    >
+        <img src="{{ sample.image.url }}" alt="{{ sample.title }} work sample" loading="lazy">
+        <span class="work-preview-overlay"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-search"></use></svg> View work</span>
+        {% if sample.category == 'video' %}<span class="work-type-badge"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-video"></use></svg> Video</span>{% endif %}
+    </button>
+    <div class="work-sample-body">
+        <div class="work-sample-meta"><span>{{ sample.get_category_display }}</span>{% if sample.project_date %}<time>{{ sample.project_date|date:'Y' }}</time>{% endif %}</div>
+        <h3>{{ sample.title }}</h3>
+        {% if sample.client_or_company %}<p class="work-client">For {{ sample.client_or_company }}</p>{% endif %}
+        {% if sample.description %}<p>{{ sample.description|truncatewords:20 }}</p>{% endif %}
+        {% if sample.video_url or sample.external_url %}<div class="work-sample-actions">{% if sample.video_url %}<a class="text-link" href="{{ sample.video_url }}" target="_blank" rel="noopener">Watch video <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a>{% endif %}{% if sample.external_url %}<a class="text-link" href="{{ sample.external_url }}" target="_blank" rel="noopener">Open project <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a>{% endif %}</div>{% endif %}
+    </div>
+</article>

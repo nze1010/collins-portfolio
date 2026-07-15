@@ -1,0 +1,55 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Search | CollinsTechEmpire{% endblock %}
+
+{% block content %}
+<section class="page-hero compact-hero search-hero">
+    <div class="shell page-hero-content reveal">
+        <span class="eyebrow">Search CollinsTechEmpire</span>
+        <h1>Find the right <span>skill, project, or insight</span></h1>
+        <p>Search across professional capabilities, work, services, articles, experience, organisations, credentials, and research interests.</p>
+        <form class="search-page-form glass-card" method="get" action="{% url 'site_search' %}" role="search">
+            <label for="search-page-input">Search the complete portfolio</label>
+            <div class="global-search-field">
+                <svg class="icon" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-search"></use></svg>
+                <input id="search-page-input" name="q" type="search" value="{{ query }}" placeholder="What would you like to find?" required autofocus>
+                <button class="button button-primary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="section-block search-results-section">
+    <div class="shell">
+        {% if query %}
+            <div class="section-heading reveal">
+                <div><span class="eyebrow">Search results</span><h2>{{ total_results }} result{{ total_results|pluralize }} for <span>“{{ query }}”</span></h2></div>
+            </div>
+            {% if result_groups %}
+                <div class="search-result-groups">
+                    {% for group in result_groups %}
+                        <section class="search-result-group reveal">
+                            <div class="search-group-heading"><svg class="icon" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-{{ group.icon }}"></use></svg><h3>{{ group.label }}</h3><span>{{ group.results|length }}</span></div>
+                            <div class="search-result-list stagger-grid">
+                                {% for result in group.results %}
+                                    <a class="search-result-card glass-card reveal-card" href="{{ result.url }}">
+                                        <span class="search-result-meta">{{ result.meta|default:group.label }}</span>
+                                        <strong>{{ result.title }}</strong>
+                                        {% if result.description %}<p>{{ result.description|truncatewords:28 }}</p>{% endif %}
+                                        <svg class="icon" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </section>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state glass-card reveal"><h2>No matching content found</h2><p>Try a broader word such as engineering, Django, solar, design, research, or AI.</p></div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state glass-card reveal"><h2>Start with a keyword</h2><p>The search covers every major public section of the portfolio.</p></div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

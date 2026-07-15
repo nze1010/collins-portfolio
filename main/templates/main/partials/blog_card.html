@@ -1,0 +1,22 @@
+{% load static %}
+<article class="article-card glass-card reveal-card">
+    {% if post.cover_image %}
+        <a href="{% url 'blog_detail' post.pk %}" class="article-image">
+            <img src="{{ post.cover_image.url }}" alt="Cover for {{ post.title }}" loading="lazy">
+        </a>
+    {% endif %}
+    <div class="article-card-body">
+        <div class="article-meta">
+            <span>{{ post.category }}</span>
+            <span>{{ post.reading_time }} min read</span>
+        </div>
+        <h3><a href="{% url 'blog_detail' post.pk %}">{{ post.title }}</a></h3>
+        <p>{{ post.excerpt|default:post.content|truncatewords:24 }}</p>
+        <div class="article-footer">
+            <time datetime="{{ post.created_at|date:'Y-m-d' }}">{{ post.created_at|date:'M d, Y' }}</time>
+            <a href="{% url 'blog_detail' post.pk %}" aria-label="Read {{ post.title }}">
+                <svg class="icon" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg>
+            </a>
+        </div>
+    </div>
+</article>

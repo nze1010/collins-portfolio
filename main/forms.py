@@ -1,53 +1,56 @@
 from django import forms
-from .models import ContactMessage, BlogPost
+
+from .models import BlogPost, ContactMessage
 
 
-# This form is shown on the Contact page. It is tied directly to the
-# ContactMessage model, so Django builds the fields for us and we just
-# need to save() it inside the view once it is valid.
 class ContactForm(forms.ModelForm):
     class Meta:
         model = ContactMessage
-        fields = ['name', 'email', 'subject', 'message']
+        fields = ['name', 'email', 'enquiry_type', 'subject', 'message']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Your full name',
+                'autocomplete': 'name',
             }),
             'email': forms.EmailInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'you@example.com',
+                'autocomplete': 'email',
             }),
+            'enquiry_type': forms.Select(attrs={'class': 'form-control'}),
             'subject': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'What is this about?',
+                'placeholder': 'What would you like to discuss?',
             }),
             'message': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Type your message here...',
-                'rows': 5,
+                'placeholder': 'Tell me about your project or opportunity...',
+                'rows': 6,
             }),
         }
 
 
-# This form is used for both creating and updating a blog post.
-# Because it is a ModelForm, the same class handles Create and Update -
-# the view just decides whether to pass in an existing instance or not.
 class BlogPostForm(forms.ModelForm):
     class Meta:
         model = BlogPost
-        fields = ['title', 'author', 'content']
+        fields = [
+            'title',
+            'author',
+            'category',
+            'excerpt',
+            'cover_image',
+            'is_featured',
+            'content',
+        ]
         widgets = {
-            'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Post title',
-            }),
-            'author': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Post title'}),
+            'author': forms.TextInput(attrs={'class': 'form-control'}),
+            'category': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Article topic'}),
+            'excerpt': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
-                'rows': 10,
-                'placeholder': 'Write your blog post here...',
+                'rows': 14,
+                'placeholder': 'Write your article here...',
             }),
         }

@@ -1,66 +1,188 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Collins Tech Empire — Portfolio of Engr. Josiah Collins Chinaza. Electrical Engineer, AI Specialist, and Python/Django Developer.">
-    <title>{% block title %}Collins Tech Empire | Portfolio{% endblock %}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'main/style.css' %}">
-    <!-- Theme is applied before paint to avoid flash -->
+    <meta name="description" content="Portfolio of Engr. Josiah Collins Chinaza — engineering, artificial intelligence, Django development, renewable energy, research, and digital innovation.">
+    <meta name="theme-color" content="#08111F">
+    <title>{% block title %}CollinsTechEmpire | Engineering Intelligent Solutions{% endblock %}</title>
+    <link rel="icon" href="{% static 'main/brand-logo.svg' %}" type="image/svg+xml">
     <script>
-        (function(){
-            var t=localStorage.getItem('cte-theme');
-            if(!t) t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
-            if(t==='dark') document.documentElement.setAttribute('data-theme','dark');
-        })();
+        (function () {
+            var saved = localStorage.getItem('cte-theme');
+            var preferred = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', saved || preferred);
+        }());
     </script>
+    <link rel="stylesheet" href="{% static 'main/style.css' %}?v=20260715-12">
 </head>
-<body>
+<body data-page="{{ request.resolver_match.url_name|default:'page' }}">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
 
-    <header class="site-header">
-        <div class="header-inner">
-            <!-- CTE Text-Based Logo -->
-            <a href="{% url 'home' %}" class="logo" aria-label="Collins Tech Empire Home">
-                <span class="logo-mark" title="CTE — Collins Tech Empire" aria-hidden="true"></span>
-                <span class="logo-name">Collins<span>TechEmpire</span></span>
+    <div class="ambient-layer" aria-hidden="true">
+        <span class="ambient-grid"></span>
+    </div>
+    <div class="site-watermark" aria-hidden="true">
+        {% if site_settings.background_watermark %}
+            <img src="{{ site_settings.background_watermark.url }}" alt="">
+        {% else %}
+            <img src="{% static 'main/brand-logo.svg' %}" alt="">
+        {% endif %}
+    </div>
+
+    <header class="site-header" id="site-header">
+        <div class="shell header-inner">
+            <a href="{% url 'home' %}" class="brand" aria-label="CollinsTechEmpire home">
+                <span class="brand-mark" aria-hidden="true">
+                    <img src="{% static 'main/brand-logo.svg' %}" alt="">
+                </span>
+                <span class="brand-wordmark">Collins<span>TechEmpire</span></span>
             </a>
 
-            <!-- Navigation & Theme Toggle -->
-            <nav class="nav-links" aria-label="Main navigation">
-                <a href="{% url 'home' %}" class="active-nav">Home</a>
-                <a href="{% url 'skill_list' %}">Skills</a>
-                <a href="{% url 'blog_list' %}">Blog</a>
-                <a href="{% url 'contact' %}">Contact</a>
+            <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Open navigation">
+                <svg class="icon icon-menu"><use href="{% static 'main/icons.svg' %}#icon-menu"></use></svg>
+                <svg class="icon icon-close"><use href="{% static 'main/icons.svg' %}#icon-close"></use></svg>
+            </button>
 
-                <!-- Light/Dark Mode Toggle -->
-                <button id="theme-toggle-btn" class="theme-toggle" aria-label="Toggle light/dark mode" title="Toggle theme">
-                    <span class="icon-sun"  aria-hidden="true">☀️</span>
-                    <span class="icon-moon" aria-hidden="true">🌙</span>
+            <nav class="primary-nav" id="primary-nav" aria-label="Primary navigation">
+                <a href="{% url 'home' %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>Home</a>
+                <a href="{% url 'home' %}#about">About</a>
+                <a href="{% url 'skill_list' %}" {% if request.resolver_match.url_name == 'skill_list' %}aria-current="page"{% endif %}>Skills</a>
+                <a href="{% url 'project_list' %}" {% if 'project' in request.resolver_match.url_name %}aria-current="page"{% endif %}>Work</a>
+                <a href="{% url 'journey' %}" {% if request.resolver_match.url_name == 'journey' %}aria-current="page"{% endif %}>Journey</a>
+                <a href="{% url 'blog_list' %}" {% if 'blog' in request.resolver_match.url_name %}aria-current="page"{% endif %}>Blog</a>
+                <a href="{% url 'contact' %}" {% if request.resolver_match.url_name == 'contact' %}aria-current="page"{% endif %}>Contact</a>
+                <button id="global-search-toggle" class="global-search-toggle" type="button" aria-label="Search the website" title="Search the website" aria-haspopup="dialog" aria-controls="site-search-dialog">
+                    <svg class="icon" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-search"></use></svg>
+                </button>
+                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme">
+                    <svg class="icon theme-sun" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-sun"></use></svg>
+                    <svg class="icon theme-moon" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-moon"></use></svg>
                 </button>
             </nav>
         </div>
     </header>
 
-    <main class="container page-content">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+    <aside class="visitor-timebar" aria-label="Local welcome, date, and time">
+        <div class="shell visitor-timebar-inner">
+            <p class="visitor-greeting">
+                <span class="visitor-greeting-dot" aria-hidden="true"></span>
+                <span data-visitor-greeting>Welcome</span>
+            </p>
+            <p class="visitor-datetime">
+                <time data-local-date></time>
+                <span aria-hidden="true">&bull;</span>
+                <time data-local-time></time>
+                <small data-local-timezone></small>
+            </p>
+        </div>
+    </aside>
 
+    {% if messages %}
+        <div class="shell message-stack" aria-live="polite">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <svg class="icon" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-check"></use></svg>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main id="main-content">
         {% block content %}{% endblock %}
     </main>
 
     <footer class="site-footer">
-        <div class="container">
-            <p>&copy; {% now "Y" %} Collins Tech Empire &mdash; Built with Django &amp; ❤️</p>
+        <div class="shell footer-grid">
+            <div class="footer-brand">
+                <a href="{% url 'home' %}" class="brand" aria-label="CollinsTechEmpire home">
+                    <span class="brand-mark" aria-hidden="true">
+                        <img src="{% static 'main/brand-logo.svg' %}" alt="">
+                    </span>
+                    <span class="brand-wordmark">Collins<span>TechEmpire</span></span>
+                </a>
+                <p>{{ site_settings.footer_statement|default:'Engineering and intelligent digital solutions for a changing world.' }}</p>
+            </div>
+            <div>
+                <h2 class="footer-heading">Navigate</h2>
+                <div class="footer-links">
+                    <a href="{% url 'home' %}#about">About</a>
+                    <a href="{% url 'skill_list' %}">Skills</a>
+                    <a href="{% url 'project_list' %}">Work</a>
+                    <a href="{% url 'journey' %}">Journey</a>
+                    <a href="{% url 'blog_list' %}">Insights</a>
+                    <a href="{% url 'contact' %}">Contact</a>
+                </div>
+            </div>
+            <div>
+                <h2 class="footer-heading">Connect</h2>
+                <div class="social-links">
+                    {% for link in social_links %}
+                        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ link.platform }}" class="social-link social-{{ link.icon_name }}">
+                            <svg class="icon" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-{{ link.icon_name }}"></use></svg>
+                            <span>{{ link.platform }}</span>
+                        </a>
+                    {% empty %}
+                        <a href="{% url 'contact' %}">
+                            <svg class="icon" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-message"></use></svg>
+                            <span>Start a conversation</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="shell footer-bottom">
+            <p>&copy; {% now "Y" %} CollinsTechEmpire. Built with Python and Django.</p>
+            <button class="back-to-top" id="back-to-top" type="button" aria-label="Back to top">
+                <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-up"></use></svg>
+            </button>
         </div>
     </footer>
 
-    <script src="{% static 'main/script.js' %}" defer></script>
+    <a
+        class="whatsapp-float"
+        href="https://wa.me/2348037479362?text=Hello%20CollinsTechEmpire%2C%20I%20visited%20your%20portfolio%20and%20would%20like%20to%20chat."
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat with CollinsTechEmpire on WhatsApp"
+        title="Chat with me on WhatsApp"
+    >
+        <span class="whatsapp-label">Chat with me</span>
+        <span class="whatsapp-icon" aria-hidden="true">
+            <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-whatsapp"></use></svg>
+        </span>
+    </a>
+
+    <dialog class="work-lightbox" id="work-lightbox" aria-labelledby="work-lightbox-title">
+        <button class="lightbox-close" type="button" data-lightbox-close aria-label="Close work preview">
+            <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-close"></use></svg>
+        </button>
+        <img id="work-lightbox-image" src="" alt="">
+        <div class="lightbox-caption"><span class="eyebrow">Portfolio work</span><h2 id="work-lightbox-title"></h2><p id="work-lightbox-description"></p></div>
+    </dialog>
+
+    <dialog class="site-search-dialog" id="site-search-dialog" aria-labelledby="site-search-title">
+        <div class="site-search-panel">
+            <div class="site-search-heading">
+                <div><span class="eyebrow">Site-wide search</span><h2 id="site-search-title">What are you looking for?</h2></div>
+                <button class="search-dialog-close" type="button" data-search-close aria-label="Close website search">
+                    <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-close"></use></svg>
+                </button>
+            </div>
+            <form class="global-search-form" method="get" action="{% url 'site_search' %}" role="search">
+                <label for="global-search-input">Search skills, projects, articles, services, experience, and credentials</label>
+                <div class="global-search-field">
+                    <svg class="icon" aria-hidden="true"><use href="{% static 'main/icons.svg' %}#icon-search"></use></svg>
+                    <input id="global-search-input" name="q" type="search" placeholder="Try “Django”, “solar”, “design”, or “AI”" required autocomplete="off">
+                    <button class="button button-primary" type="submit">Search</button>
+                </div>
+            </form>
+            <p class="search-hint">Search across the complete CollinsTechEmpire portfolio.</p>
+        </div>
+    </dialog>
+
+    <script src="{% static 'main/script.js' %}?v=20260715-9" defer></script>
 </body>
 </html>
-

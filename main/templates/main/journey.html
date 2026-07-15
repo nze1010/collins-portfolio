@@ -1,0 +1,117 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Professional Journey | CollinsTechEmpire{% endblock %}
+
+{% block content %}
+<section class="journey-hero">
+    <div class="journey-orbit" aria-hidden="true">
+        {% for certification in featured_certifications %}
+            <div class="credential-float credential-{{ forloop.counter }}">
+                {% if certification.image %}<img src="{{ certification.image.url }}" alt="">{% else %}<svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-award"></use></svg>{% endif %}
+                <span>{{ certification.issuer|default:'Credential' }}</span>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="shell journey-hero-content reveal">
+        <span class="journey-kicker"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-award"></use></svg> Professional milestones</span>
+        <h1>Experience &amp; <span>Credentials</span></h1>
+        <p>A professional record of practical roles, organisations, qualifications, verified certificates, and continuous development.</p>
+        <div class="journey-stats" aria-label="Professional journey statistics">
+            {% for stat in journey_stats %}<span><strong data-counter="{{ stat.value }}">0</strong>{{ stat.label }}</span>{% endfor %}
+        </div>
+        <nav class="journey-section-nav" aria-label="Journey sections">
+            <a href="#roles"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-briefcase"></use></svg><span><small>Explore</small>Professional Roles</span></a>
+            <a href="#organizations"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-building"></use></svg><span><small>Discover</small>Organisations</span></a>
+            <a href="#credentials"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-award"></use></svg><span><small>Review</small>Credentials</span></a>
+        </nav>
+    </div>
+</section>
+
+<section class="section-block journey-section" id="roles">
+    <div class="shell">
+        <div class="section-heading reveal">
+            <div><span class="eyebrow">Professional Roles</span><h2>Responsibilities shaped by <span>practical contribution</span></h2><p>Engineering, technology, design, research, communication, and independent professional practice.</p></div>
+            <span class="section-count">{{ experiences|length|stringformat:'02d' }} roles</span>
+        </div>
+        {% if experiences %}
+            <div class="professional-role-grid stagger-grid">
+                {% for experience in experiences %}
+                    <article class="professional-role-card glass-card reveal-card">
+                        <div class="role-card-top">
+                            <span class="journey-number" aria-label="Professional role {{ forloop.counter }}">{{ forloop.counter }}</span>
+                        </div>
+                        <div class="role-meta">
+                            <span>{{ experience.get_employment_type_display|default:'Professional role' }}</span>
+                            {% if experience.display_period %}<time>{{ experience.display_period }}</time>{% endif %}
+                        </div>
+                        <h3>{{ experience.role }}</h3>
+                        <p class="role-organization">{{ experience.display_organization }}{% if experience.location %} · {{ experience.location }}{% endif %}</p>
+                        {% if experience.summary %}<p class="experience-summary">{{ experience.summary }}</p>{% endif %}
+                        {% if experience.highlight_list %}<ul>{% for highlight in experience.highlight_list %}<li>{{ highlight }}</li>{% endfor %}</ul>{% endif %}
+                        {% if experience.company_url %}<a class="text-link" href="{{ experience.company_url }}" target="_blank" rel="noopener">Visit organisation <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a>{% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}<div class="curation-note glass-card reveal"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-briefcase"></use></svg><div><h3>Professional roles</h3></div></div>{% endif %}
+    </div>
+</section>
+
+<section class="section-block organization-section" id="organizations">
+    <div class="shell">
+        <div class="section-heading reveal">
+            <div><span class="eyebrow">Organisations</span><h2>Brands and platforms connected to <span>the journey</span></h2><p>Employers, enterprises, digital platforms, and independent professional practice.</p></div>
+            <span class="section-count">{{ organizations|length|stringformat:'02d' }} organisations</span>
+        </div>
+        {% if organizations %}
+            <div class="organization-grid stagger-grid">
+                {% for organization in organizations %}
+                    <article class="organization-card glass-card reveal-card">
+                        <div class="organization-card-heading">
+                            <span class="journey-number" aria-label="Organisation {{ forloop.counter }}">{{ forloop.counter }}</span>
+                        </div>
+                        <p class="organization-type">{{ organization.get_organization_type_display }}</p>
+                        <h3>{{ organization.name }}</h3>
+                        <p>{{ organization.description }}</p>
+                        {% if organization.website_url %}<a class="text-link" href="{{ organization.website_url }}" target="_blank" rel="noopener">Visit organisation <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a>{% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}<div class="curation-note glass-card reveal"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-building"></use></svg><div><h3>Organisations</h3></div></div>{% endif %}
+    </div>
+</section>
+
+<section class="section-block journey-certifications" id="credentials">
+    <div class="shell">
+        <div class="section-heading reveal">
+            <div><span class="eyebrow">Credentials</span><h2>Qualifications, certificates &amp; <span>professional training</span></h2><p>Verified credentials are clearly identified. Other entries are presented accurately as qualification, training, or seminar records.</p></div>
+            <span class="section-count">{{ certifications|length|stringformat:'02d' }} credentials</span>
+        </div>
+        {% if certifications %}
+            <div class="credential-gallery stagger-grid">
+                {% for certification in certifications %}
+                    <article class="credential-card glass-card reveal-card">
+                        <div class="credential-image{% if not certification.image %} credential-image-placeholder{% endif %}">
+                            {% if certification.image %}<img src="{{ certification.image.url }}" alt="{{ certification.title }} certificate" loading="lazy">
+                            {% else %}<div><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-award"></use></svg><span>{{ certification.get_record_type_display }}</span></div>{% endif %}
+                        </div>
+                        <div class="credential-body">
+                            <div class="credential-status-row">
+                                <span class="credential-status{% if certification.is_verified %} is-verified{% endif %}">{% if certification.is_verified %}<svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-check"></use></svg> Verified credential{% else %}{{ certification.get_record_type_display }} record{% endif %}</span>
+                                {% if certification.date_earned %}<time>{{ certification.date_earned|date:'Y' }}</time>{% endif %}
+                            </div>
+                            <p class="credential-issuer">{{ certification.issuer|default:certification.get_record_type_display }}</p>
+                            <h3>{{ certification.title }}</h3>
+                            {% if certification.description %}<p>{{ certification.description }}</p>{% endif %}
+                            {% if certification.credential_id %}<small>Credential ID: {{ certification.credential_id }}</small>{% endif %}
+                            {% if certification.credential_url %}<a class="text-link" href="{{ certification.credential_url }}" target="_blank" rel="noopener">Verify credential <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a>{% endif %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}<div class="curation-note glass-card reveal"><svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-award"></use></svg><div><h3>Credential records</h3></div></div>{% endif %}
+    </div>
+</section>
+
+{% if featured_projects %}<section class="section-block"><div class="shell"><div class="section-heading reveal"><div><span class="eyebrow">Selected Work</span><h2>Projects shaped by <span>real capability</span></h2></div><a class="text-link" href="{% url 'project_list' %}">View all work <svg class="icon"><use href="{% static 'main/icons.svg' %}#icon-arrow-right"></use></svg></a></div><div class="project-grid stagger-grid">{% for project in featured_projects %}{% include 'main/partials/project_card.html' %}{% endfor %}</div></div></section>{% endif %}
+{% endblock %}

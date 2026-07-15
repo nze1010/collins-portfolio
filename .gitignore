@@ -10,8 +10,13 @@ env/
 # Database
 db.sqlite3
 
-# User-uploaded files
-media/
+# User-uploaded files stay private by default. These two verified portfolio
+# credentials are intentionally versioned so deployments include them.
+media/*
+!media/certifications/
+media/certifications/*
+!media/certifications/alx-virtual-assistant-certificate.jpg
+!media/certifications/alx-ai-career-essentials-certificate.jpg
 
 # Environment variables
 .env
