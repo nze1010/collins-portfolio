@@ -2,7 +2,12 @@ import datetime
 from django.utils import timezone
 from django.db.models import Count, Avg
 from django.db.models.functions import TruncDay
-from .models import Visitor, PageView, ReadDuration
+from django.contrib.auth.models import User, Group
+from .models import (
+    Visitor, PageView, ReadDuration, BlogPost, Project, Skill,
+    Certification, ContactMessage, Service, WorkSample, SocialLink,
+    ToolkitItem, Organization, Experience
+)
 
 def dashboard_callback(request, context):
     now = timezone.now()
@@ -99,6 +104,21 @@ def dashboard_callback(request, context):
         'chart_category_labels': chart_category_labels,
         'chart_category_data': chart_category_data,
         'popular_posts': formatted_popular_posts,
+        
+        # Model Counts for Control Panel Grid
+        'count_blog_posts': BlogPost.objects.count(),
+        'count_projects': Project.objects.count(),
+        'count_skills': Skill.objects.count(),
+        'count_credentials': Certification.objects.count(),
+        'count_messages': ContactMessage.objects.count(),
+        'count_services': Service.objects.count(),
+        'count_work_samples': WorkSample.objects.count(),
+        'count_social_links': SocialLink.objects.count(),
+        'count_organizations': Organization.objects.count(),
+        'count_experiences': Experience.objects.count(),
+        'count_toolkit_items': ToolkitItem.objects.count(),
+        'count_users': User.objects.count(),
+        'count_groups': Group.objects.count(),
     })
 
     return context

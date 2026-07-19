@@ -1,0 +1,989 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+<style>
+/* ─────────────────────────────────────────────────────────────
+   CollinsTechEmpire — Ultra-Premium SaaS Admin Control Panel
+   ───────────────────────────────────────────────────────────── */
+.cte-dash {
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+    padding: 0 0 50px;
+    color: #f1f5f9;
+}
+
+/* Hero Panel */
+.cte-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #020617 100%);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 24px;
+    padding: 32px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+}
+.cte-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+}
+.cte-hero-details h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.cte-hero-details p {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin: 0;
+}
+.cte-live-badge {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: 16px;
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 150px;
+    backdrop-filter: blur(10px);
+}
+.cte-live-num {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #10b981;
+    line-height: 1;
+    display: block;
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+.cte-live-lbl {
+    font-size: 0.68rem;
+    color: #34d399;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    margin-top: 8px;
+    display: block;
+}
+
+/* Pulsing badge dot */
+.cte-pulse-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #10b981;
+    position: relative;
+}
+.cte-pulse-dot::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.4);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.8); opacity: 0; }
+}
+
+/* Section Header Dividers */
+.cte-section-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 36px 0 20px;
+}
+.cte-section-title span {
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #64748b;
+    white-space: nowrap;
+}
+.cte-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Analytics Stats Grid */
+.cte-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+@media (max-width: 1024px) { .cte-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .cte-stats-grid { grid-template-columns: 1fr; } }
+
+.cte-stat-card {
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+}
+.cte-stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+.cte-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 16px;
+}
+.cte-stat-card--blue   .cte-stat-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.cte-stat-card--purple .cte-stat-icon { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+.cte-stat-card--green  .cte-stat-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.cte-stat-card--orange .cte-stat-icon { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+
+.cte-stat-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #475569;
+    margin: 0 0 6px;
+}
+.cte-stat-val {
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+}
+.cte-stat-card--blue   .cte-stat-val { color: #60a5fa; }
+.cte-stat-card--purple .cte-stat-val { color: #c084fc; }
+.cte-stat-card--green  .cte-stat-val { color: #34d399; }
+.cte-stat-card--orange .cte-stat-val { color: #fdba74; }
+
+.cte-stat-desc {
+    font-size: 0.7rem;
+    color: #475569;
+}
+
+/* Charts & Visual Grid */
+.cte-visual-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+@media (max-width: 960px) { .cte-visual-grid { grid-template-columns: 1fr; } }
+
+.cte-box {
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 24px;
+}
+.cte-box-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.cte-box-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.cte-box-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cte-chart-container {
+    position: relative;
+    height: 220px;
+}
+
+/* Split row (Category Chart + Popular posts table) */
+.cte-split-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+@media (max-width: 960px) { .cte-split-grid { grid-template-columns: 1fr; } }
+
+/* Table styling */
+.cte-table-wrap {
+    overflow-x: auto;
+}
+.cte-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.cte-table th {
+    text-align: left;
+    padding: 0 12px 12px;
+    color: #475569;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.cte-table th:first-child { padding-left: 0; }
+.cte-table td {
+    padding: 12px;
+    color: #94a3b8;
+    font-size: 0.78rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.cte-table td:first-child { padding-left: 0; font-weight: 600; color: #cbd5e1; }
+.cte-table a { color: #f1f5f9; text-decoration: none; transition: color 0.2s; }
+.cte-table a:hover { color: #6366f1; }
+
+.cte-rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 800;
+}
+.cte-rank-1 { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.cte-rank-2 { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+.cte-rank-3 { background: rgba(180, 83, 9, 0.15); color: #f97316; }
+.cte-rank-n { background: rgba(255, 255, 255, 0.04); color: #475569; }
+
+.cte-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+.cte-pill--green  { background: rgba(16, 185, 129, 0.1); color: #34d399; }
+.cte-pill--yellow { background: rgba(245, 158, 11, 0.1); color: #fbbf24; }
+.cte-pill--red    { background: rgba(239, 68, 68, 0.1); color: #f87171; }
+
+/* Control Center - Elegant Grid View */
+.cte-control-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.cte-control-card {
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+.cte-control-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(99, 102, 241, 0.25);
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+}
+.cte-cc-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.cte-cc-icon-wrap {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: background 0.2s;
+}
+.cte-control-card:hover .cte-cc-icon-wrap {
+    background: rgba(99, 102, 241, 0.1);
+}
+.cte-cc-count {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.02);
+}
+.cte-control-card:hover .cte-cc-count {
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.05);
+    border-color: rgba(99, 102, 241, 0.1);
+}
+.cte-cc-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 6px;
+}
+.cte-cc-desc {
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.4;
+    margin-bottom: 18px;
+    flex-grow: 1;
+}
+.cte-cc-actions {
+    display: flex;
+    gap: 8px;
+}
+.cte-cc-btn {
+    flex: 1;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 8px 10px;
+    border-radius: 10px;
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+.cte-cc-btn--primary {
+    background: rgba(99, 102, 241, 0.1);
+    color: #818cf8;
+    border: 1px solid rgba(99, 102, 241, 0.15);
+}
+.cte-cc-btn--primary:hover {
+    background: #4f46e5;
+    color: #ffffff;
+    border-color: #4f46e5;
+}
+.cte-cc-btn--secondary {
+    background: rgba(255, 255, 255, 0.03);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+.cte-cc-btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #f1f5f9;
+}
+</style>
+
+<div class="cte-dash">
+
+    <!-- ── 1. HERO REAL-TIME BANNER ────────────────── -->
+    <div class="cte-hero">
+        <div class="cte-hero-details">
+            <h1>
+                <span class="cte-pulse-dot"></span>
+                CollinsTechEmpire Analytics
+            </h1>
+            <p>Sleek, live intelligence hub for your digital portfolio &amp; creative content platforms</p>
+        </div>
+        <div class="cte-live-badge">
+            <span class="cte-live-num">{{ active_users }}</span>
+            <span class="cte-live-lbl">🟢 Active Visitors</span>
+        </div>
+    </div>
+
+    <!-- ── 2. KEY METRICS STAT CARDS ────────────────── -->
+    <div class="cte-stats-grid">
+        <div class="cte-stat-card cte-stat-card--blue">
+            <div class="cte-stat-icon">👥</div>
+            <p class="cte-stat-label">Unique Visitors</p>
+            <p class="cte-stat-val">{{ total_visitors }}</p>
+            <p class="cte-stat-desc">Distinct tracking sessions</p>
+        </div>
+
+        <div class="cte-stat-card cte-stat-card--purple">
+            <div class="cte-stat-icon">📄</div>
+            <p class="cte-stat-label">Total Page Views</p>
+            <p class="cte-stat-val">{{ total_page_views }}</p>
+            <p class="cte-stat-desc">Accumulated across all pages</p>
+        </div>
+
+        <div class="cte-stat-card cte-stat-card--green">
+            <div class="cte-stat-icon">⏱️</div>
+            <p class="cte-stat-label">Avg Read Time</p>
+            <p class="cte-stat-val">{{ avg_duration_min }}<span style="font-size:1.1rem">m</span></p>
+            <p class="cte-stat-desc">Attention span per article</p>
+        </div>
+
+        <div class="cte-stat-card cte-stat-card--orange">
+            <div class="cte-stat-icon">📜</div>
+            <p class="cte-stat-label">Avg Scroll Depth</p>
+            <p class="cte-stat-val">{{ avg_scroll_percent }}<span style="font-size:1.1rem">%</span></p>
+            <p class="cte-stat-desc">Scroll completion percentage</p>
+        </div>
+    </div>
+
+    <!-- ── 3. VISUAL INTELLIGENCE CHARTS ────────────── -->
+    <div class="cte-visual-grid">
+        <!-- Line Chart: Traffic trend -->
+        <div class="cte-box">
+            <div class="cte-box-header">
+                <span class="cte-box-title">📈 Traffic History (Last 7 Days)</span>
+                <span class="cte-box-badge">Views Trend</span>
+            </div>
+            <div class="cte-chart-container">
+                <canvas id="viewsTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Doughnut: Devices -->
+        <div class="cte-box">
+            <div class="cte-box-header">
+                <span class="cte-box-title">📱 Device Split</span>
+                <span class="cte-box-badge">Form Factor</span>
+            </div>
+            <div class="cte-chart-container">
+                <canvas id="devicesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="cte-split-grid">
+        <!-- Category Chart -->
+        <div class="cte-box">
+            <div class="cte-box-header">
+                <span class="cte-box-title">🏷️ Topic Engagement</span>
+                <span class="cte-box-badge">By Category</span>
+            </div>
+            <div class="cte-chart-container">
+                <canvas id="categoriesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Top posts table -->
+        <div class="cte-box">
+            <div class="cte-box-header">
+                <span class="cte-box-title">🔥 Top Content &amp; Blog Posts</span>
+                <span class="cte-box-badge">By Page Views</span>
+            </div>
+            <div class="cte-table-wrap">
+                <table class="cte-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">Rank</th>
+                            <th>Post Title</th>
+                            <th>Views</th>
+                            <th>Avg Duration</th>
+                            <th>Avg Scroll</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in popular_posts %}
+                        <tr>
+                            <td>
+                                {% if forloop.counter == 1 %}<span class="cte-rank-badge cte-rank-1">1</span>
+                                {% elif forloop.counter == 2 %}<span class="cte-rank-badge cte-rank-2">2</span>
+                                {% elif forloop.counter == 3 %}<span class="cte-rank-badge cte-rank-3">3</span>
+                                {% else %}<span class="cte-rank-badge cte-rank-n">{{ forloop.counter }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/admin/main/blogpost/{{ post.id }}/change/">
+                                    {{ post.title|truncatechars:42 }}
+                                </a>
+                            </td>
+                            <td><strong style="color: #60a5fa;">{{ post.views }}</strong></td>
+                            <td style="color: #c084fc;">{{ post.avg_read }}</td>
+                            <td>
+                                {% with scroll=post.avg_scroll %}
+                                    {% if "7" in scroll or "8" in scroll or "9" in scroll or "100" in scroll %}
+                                        <span class="cte-pill cte-pill--green">{{ scroll }}</span>
+                                    {% elif "4" in scroll or "5" in scroll or "6" in scroll %}
+                                        <span class="cte-pill cte-pill--yellow">{{ scroll }}</span>
+                                    {% else %}
+                                        <span class="cte-pill cte-pill--red">{{ scroll }}</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 32px 0; color: #475569;">
+                                📊 No blog views tracked yet. Browse posts on the site to trigger data logs!
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── 4. CONTROL CENTER - MAIN PORTFOLIO GRID ── -->
+    <div class="cte-section-title">
+        <span>🎨 Content &amp; Creative Portfolio</span>
+    </div>
+    <div class="cte-control-grid">
+        <!-- Blog Posts -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">📝</div>
+                <div class="cte-cc-count">{{ count_blog_posts }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Blog Posts</div>
+                <div class="cte-cc-desc">Publish tech articles, tutorials, case studies, and engineering briefs.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/blogpost/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/main/blogpost/add/" class="cte-cc-btn cte-cc-btn--primary">+ Write Post</a>
+            </div>
+        </div>
+
+        <!-- Projects -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">🚀</div>
+                <div class="cte-cc-count">{{ count_projects }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Projects</div>
+                <div class="cte-cc-desc">Manage software applications, engineering builds, GitHub repos, and live links.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/project/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/main/project/add/" class="cte-cc-btn cte-cc-btn--primary">+ New Project</a>
+            </div>
+        </div>
+
+        <!-- Work Samples -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">🎨</div>
+                <div class="cte-cc-count">{{ count_work_samples }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Work Samples</div>
+                <div class="cte-cc-desc">Manage UI/UX screenshots, media designs, animations, and photography thumbnails.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/worksample/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/main/worksample/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Sample</a>
+            </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">🛠️</div>
+                <div class="cte-cc-count">{{ count_skills }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Skills</div>
+                <div class="cte-cc-desc">Edit technical skill names, category categories, proficiency stats, and SVG icons.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/skill/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/main/skill/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Skill</a>
+            </div>
+        </div>
+
+        <!-- Toolkit Items -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">🧰</div>
+                <div class="cte-cc-count">{{ count_toolkit_items }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Toolkit Items</div>
+                <div class="cte-cc-desc">Manage utilities, frameworks, operating systems, and developer tools in use.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/toolkititem/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/main/toolkititem/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Item</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 5. CONTROL CENTER - CAREER & EXPERIENCE ── -->
+    <div class="cte-section-title">
+        <span>💼 Professional Career &amp; Experience</span>
+    </div>
+    <div class="cte-control-grid">
+        <!-- Professional Roles -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">💼</div>
+                <div class="cte-cc-count">{{ count_experiences }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Professional Roles</div>
+                <div class="cte-cc-desc">Manage employment history, engineer designations, summaries, achievements, and dates.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/experience/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/main/experience/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Role</a>
+            </div>
+        </div>
+
+        <!-- Organizations -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">🏢</div>
+                <div class="cte-cc-count">{{ count_organizations }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Organizations</div>
+                <div class="cte-cc-desc">Manage companies, educational institutes, media boards, enterprise names, and logos.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/organization/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/main/organization/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Org</a>
+            </div>
+        </div>
+
+        <!-- Credentials -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">🎓</div>
+                <div class="cte-cc-count">{{ count_credentials }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Credentials</div>
+                <div class="cte-cc-desc">Manage verified credentials, university degrees, and professional training certifications.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/certification/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/main/certification/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Cred</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 6. CONTROL CENTER - SERVICES & CONFIGURATION ── -->
+    <div class="cte-section-title">
+        <span>⚙️ Site Settings &amp; Profile Services</span>
+    </div>
+    <div class="cte-control-grid">
+        <!-- Services -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">🤝</div>
+                <div class="cte-cc-count">{{ count_services }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Services</div>
+                <div class="cte-cc-desc">Edit professional services offered (consultancy, solar installs, web designs, audits).</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/service/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/main/service/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Service</a>
+            </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">🔗</div>
+                <div class="cte-cc-count">{{ count_social_links }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Social Links</div>
+                <div class="cte-cc-desc">Manage platform URLs (LinkedIn, GitHub, Gmail, Facebook) linked in public footer.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/sociallink/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/main/sociallink/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Link</a>
+            </div>
+        </div>
+
+        <!-- Site Settings -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">⚙️</div>
+                <div class="cte-cc-count">Config</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Site Settings</div>
+                <div class="cte-cc-desc">Edit watermark logos, brand names, page availability statuses, and hero captions.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/sitesettings/1/change/" class="cte-cc-btn cte-cc-btn--primary" style="width: 100%; flex: none;">Configure Site Settings</a>
+            </div>
+        </div>
+
+        <!-- User Profile -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">👤</div>
+                <div class="cte-cc-count">Profile</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">User Profile</div>
+                <div class="cte-cc-desc">Update profile photo, CV file link, technical biography statements, and full name.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/userprofile/1/change/" class="cte-cc-btn cte-cc-btn--primary" style="width: 100%; flex: none;">Update User Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 7. CONTROL CENTER - INTELLIGENCE LOGS ── -->
+    <div class="cte-section-title">
+        <span>🛡️ Security, Access &amp; Traffic Logs</span>
+    </div>
+    <div class="cte-control-grid">
+        <!-- Contact Messages -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">✉️</div>
+                <div class="cte-cc-count">{{ count_messages }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Contact Messages</div>
+                <div class="cte-cc-desc">View lead enquiries, job notifications, consultancy details, and inbox notes.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/contactmessage/" class="cte-cc-btn cte-cc-btn--primary" style="width: 100%; flex: none;">Read Inbox Messages</a>
+            </div>
+        </div>
+
+        <!-- Visitors Log -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">👥</div>
+                <div class="cte-cc-count">{{ total_visitors }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Visitors Log</div>
+                <div class="cte-cc-desc">View unique visitor lists, parsed IP addresses, system operating models, and geolocation data.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/visitor/" class="cte-cc-btn cte-cc-btn--secondary" style="width: 100%; flex: none;">View Geolocation Logs</a>
+            </div>
+        </div>
+
+        <!-- Page Views Log -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">📄</div>
+                <div class="cte-cc-count">{{ total_page_views }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Page Views Log</div>
+                <div class="cte-cc-desc">Monitor paths, traffic sources (referrals), and complete view timestamps.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/pageview/" class="cte-cc-btn cte-cc-btn--secondary" style="width: 100%; flex: none;">View Page Views History</a>
+            </div>
+        </div>
+
+        <!-- Read Durations Log -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">⏱️</div>
+                <div class="cte-cc-count">Log</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Read Durations</div>
+                <div class="cte-cc-desc">Review scroll percentages and real-time read heartbeat logs of visitors.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/main/readduration/" class="cte-cc-btn cte-cc-btn--secondary" style="width: 100%; flex: none;">View Heartbeat Records</a>
+            </div>
+        </div>
+
+        <!-- Auth Users -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">🛡️</div>
+                <div class="cte-cc-count">{{ count_users }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Administrators</div>
+                <div class="cte-cc-desc">Manage dashboard user credentials, login passwords, and editor permissions.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/auth/user/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/auth/user/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Admin</a>
+            </div>
+        </div>
+
+        <!-- Auth Groups -->
+        <div class="cte-control-card">
+            <div class="cte-cc-top">
+                <div class="cte-cc-icon-wrap">🔒</div>
+                <div class="cte-cc-count">{{ count_groups }}</div>
+            </div>
+            <div>
+                <div class="cte-cc-name">Group Roles</div>
+                <div class="cte-cc-desc">Manage system roles and fine-grained authorization permission groups.</div>
+            </div>
+            <div class="cte-cc-actions">
+                <a href="/admin/auth/group/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                <a href="/admin/auth/group/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Group</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js and Custom Dashboard Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    const gridColor  = 'rgba(255,255,255,0.05)';
+    const textColor  = '#475569';
+    const tooltipBg  = '#1e293b';
+
+    const tooltipDefaults = {
+        backgroundColor: tooltipBg,
+        titleColor: '#e2e8f0',
+        bodyColor: '#94a3b8',
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        padding: 10,
+        cornerRadius: 8
+    };
+
+    // 1. Line chart — daily traffic
+    const ctx1 = document.getElementById('viewsTrendChart');
+    if (ctx1) {
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: {{ chart_daily_labels|safe }},
+                datasets: [{
+                    label: 'Page Views',
+                    data: {{ chart_daily_data|safe }},
+                    borderColor: '#6366f1',
+                    backgroundColor: function(context) {
+                        const chart = context.chart;
+                        const {ctx: c, chartArea} = chart;
+                        if (!chartArea) return 'transparent';
+                        const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                        gradient.addColorStop(0, 'rgba(99,102,241,0.28)');
+                        gradient.addColorStop(1, 'rgba(99,102,241,0)');
+                        return gradient;
+                    },
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.45,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#1e1b4b',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: tooltipDefaults
+                },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: textColor, precision: 0, font: { size: 11 } }, beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // 2. Doughnut — device breakdown
+    const ctx2 = document.getElementById('devicesChart');
+    if (ctx2) {
+        new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: {{ chart_device_labels|safe }},
+                datasets: [{
+                    data: {{ chart_device_data|safe }},
+                    backgroundColor: ['#6366f1','#10b981','#f59e0b','#ec4899'],
+                    hoverBackgroundColor: ['#818cf8','#34d399','#fbbf24','#f472b6'],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: tooltipDefaults,
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#64748b',
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyleWidth: 8,
+                            font: { size: 11 }
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    }
+
+    // 3. Bar chart — categories
+    const ctx3 = document.getElementById('categoriesChart');
+    if (ctx3) {
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_category_labels|safe }},
+                datasets: [{
+                    label: 'Views',
+                    data: {{ chart_category_data|safe }},
+                    backgroundColor: ['#6366f1','#10b981','#f59e0b','#ec4899','#06b6d4'],
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    barThickness: 22
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: tooltipDefaults
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: textColor, precision: 0, font: { size: 11 } }, beginAtZero: true }
+                }
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}
