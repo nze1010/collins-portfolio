@@ -445,3 +445,49 @@ class SiteSettings(models.Model):
 
     def __str__(self):
         return self.brand_name
+
+
+class Visitor(models.Model):
+    session_key = models.CharField(max_length=100, unique=True, db_index=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    device_type = models.CharField(max_length=20, default='Unknown')
+    browser = models.CharField(max_length=50, default='Unknown')
+    country = models.CharField(max_length=100, default='Unknown')
+    region = models.CharField(max_length=100, default='Unknown')
+    city = models.CharField(max_length=100, default='Unknown')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Visitor {self.session_key[:8]} ({self.country}, {self.device_type})"
+
+
+class PageView(models.Model):
+    visitor = models.ForeignKey(Visitor, on_delete=models.CASCADE, related_name='page_views')
+    blog_post = models.ForeignKey(BlogPost, null=True, blank=True, on_delete=models.SET_NULL, related_name='page_views')
+    path = models.CharField(max_length=255)
+    referrer = models.TextField(null=True, blank=True)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-viewed_at']
+
+    def __str__(self):
+        return f"{self.path} viewed by {self.visitor.session_key[:8]} at {self.viewed_at.strftime('%Y-%m-%d %H:%M')}"
+
+
+class ReadDuration(models.Model):
+    page_view = models.OneToOneField(PageView, on_delete=models.CASCADE, related_name='duration_log')
+    duration_seconds = models.PositiveIntegerField(default=0)
+    scroll_depth = models.PositiveIntegerField(default=0)
+    last_heartbeat = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-last_heartbeat']
+
+    def __str__(self):
+        return f"{self.duration_seconds}s read depth {self.scroll_depth}% for {self.page_view}"
+

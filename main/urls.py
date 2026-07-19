@@ -16,4 +16,6 @@ urlpatterns = [
     path('blog/<int:pk>/edit/', views.blog_update, name='blog_update'),
     path('blog/<int:pk>/delete/', views.blog_delete, name='blog_delete'),
     path('contact/', views.contact, name='contact'),
+    path('analytics/track-pageview/', views.track_pageview, name='track_pageview'),
+    path('analytics/track-heartbeat/', views.track_heartbeat, name='track_heartbeat'),
 ]

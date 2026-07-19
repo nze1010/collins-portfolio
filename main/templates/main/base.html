@@ -17,7 +17,8 @@
     </script>
     <link rel="stylesheet" href="{% static 'main/style.css' %}?v=20260715-12">
 </head>
-<body data-page="{{ request.resolver_match.url_name|default:'page' }}">
+<body data-page="{{ request.resolver_match.url_name|default:'page' }}"
+      {% if request.resolver_match.url_name == 'blog_detail' and post %}data-post-id="{{ post.id }}"{% endif %}>
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
     <div class="ambient-layer" aria-hidden="true">
@@ -184,5 +185,6 @@
     </dialog>
 
     <script src="{% static 'main/script.js' %}?v=20260715-9" defer></script>
+    <script src="{% static 'main/analytics.js' %}" defer></script>
 </body>
 </html>

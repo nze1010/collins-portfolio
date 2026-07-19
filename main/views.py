@@ -3,6 +3,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
 
 from .forms import BlogPostForm, ContactForm
 from .models import (
@@ -392,3 +395,126 @@ def contact(request):
         form = ContactForm()
 
     return render(request, 'main/contact.html', {'form': form})
+
+
+@csrf_exempt
+def track_pageview(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Only POST method allowed'}, status=405)
+    try:
+        data = json.loads(request.body)
+        visitor_uuid = data.get('visitor_uuid')
+        path = data.get('path', '/')
+        referrer = data.get('referrer', '')
+        blog_post_id = data.get('blog_post_id')
+        
+        # User details from headers
+        ip_address = request.META.get('HTTP_X_FORWARDED_FOR')
+        if ip_address:
+            ip_address = ip_address.split(',')[0].strip()
+        else:
+            ip_address = request.META.get('REMOTE_ADDR')
+            
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+        
+        # Device information from front-end data
+        device_type = data.get('device_type', 'Unknown')
+        browser = data.get('browser', 'Unknown')
+        
+        # Location information from front-end lookup
+        country = data.get('country', 'Unknown')
+        region = data.get('region', 'Unknown')
+        city = data.get('city', 'Unknown')
+        
+        from .models import Visitor, PageView, BlogPost
+        
+        # Get or create Visitor
+        visitor, created = Visitor.objects.get_or_create(
+            session_key=visitor_uuid,
+            defaults={
+                'ip_address': ip_address,
+                'user_agent': user_agent,
+                'device_type': device_type,
+                'browser': browser,
+                'country': country,
+                'region': region,
+                'city': city,
+            }
+        )
+        
+        # Update details if changed or if they were unknown
+        updated = False
+        if visitor.ip_address != ip_address and ip_address:
+            visitor.ip_address = ip_address
+            updated = True
+        if visitor.user_agent != user_agent and user_agent:
+            visitor.user_agent = user_agent
+            updated = True
+        if country != 'Unknown' and visitor.country == 'Unknown':
+            visitor.country = country
+            visitor.region = region
+            visitor.city = city
+            updated = True
+        if updated:
+            visitor.save()
+            
+        # Check if it's a blog post view
+        blog_post = None
+        if blog_post_id:
+            try:
+                blog_post = BlogPost.objects.get(pk=blog_post_id)
+            except BlogPost.DoesNotExist:
+                pass
+                
+        # Create PageView
+        page_view = PageView.objects.create(
+            visitor=visitor,
+            blog_post=blog_post,
+            path=path,
+            referrer=referrer
+        )
+        
+        return JsonResponse({
+            'status': 'success',
+            'page_view_id': page_view.id,
+            'visitor_id': visitor.id
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+@csrf_exempt
+def track_heartbeat(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Only POST method allowed'}, status=405)
+    try:
+        data = json.loads(request.body)
+        page_view_id = data.get('page_view_id')
+        duration_seconds = int(data.get('duration_seconds', 0))
+        scroll_depth = int(data.get('scroll_depth', 0))
+        
+        from .models import PageView, ReadDuration
+        
+        page_view = PageView.objects.get(pk=page_view_id)
+        
+        # Get or create ReadDuration
+        read_log, created = ReadDuration.objects.get_or_create(
+            page_view=page_view,
+            defaults={
+                'duration_seconds': duration_seconds,
+                'scroll_depth': scroll_depth
+            }
+        )
+        
+        if not created:
+            # Update only if values are greater to keep the peak engagement stats
+            if duration_seconds > read_log.duration_seconds:
+                read_log.duration_seconds = duration_seconds
+            if scroll_depth > read_log.scroll_depth:
+                read_log.scroll_depth = scroll_depth
+            read_log.save()
+            
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+

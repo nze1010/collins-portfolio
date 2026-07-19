@@ -401,3 +401,115 @@ class AdminAccessTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="supporting_text"')
+
+
+class AnalyticsTests(TestCase):
+    def setUp(self):
+        self.post = BlogPost.objects.create(
+            title='Test Blog Post',
+            content='This is some content for testing analytics logic.',
+            category='Tech'
+        )
+
+    def test_track_pageview_creates_records(self):
+        from .models import Visitor, PageView
+        
+        payload = {
+            'visitor_uuid': 'test-uuid-1234-5678',
+            'path': '/blog/1/',
+            'referrer': 'https://github.com',
+            'blog_post_id': self.post.id,
+            'device_type': 'Mobile',
+            'browser': 'Chrome',
+            'country': 'Nigeria',
+            'region': 'Lagos',
+            'city': 'Lagos'
+        }
+        
+        response = self.client.post(
+            reverse('track_pageview'),
+            data=payload,
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+        self.assertIn('page_view_id', data)
+        
+        # Verify database
+        self.assertTrue(Visitor.objects.filter(session_key='test-uuid-1234-5678').exists())
+        self.assertTrue(PageView.objects.filter(id=data['page_view_id']).exists())
+        
+        visitor = Visitor.objects.get(session_key='test-uuid-1234-5678')
+        self.assertEqual(visitor.device_type, 'Mobile')
+        self.assertEqual(visitor.country, 'Nigeria')
+        
+        pageview = PageView.objects.get(id=data['page_view_id'])
+        self.assertEqual(pageview.blog_post, self.post)
+        self.assertEqual(pageview.path, '/blog/1/')
+
+    def test_track_heartbeat_updates_duration(self):
+        from .models import Visitor, PageView, ReadDuration
+        
+        visitor = Visitor.objects.create(
+            session_key='test-uuid-5678-1234',
+            device_type='Desktop',
+            country='Canada'
+        )
+        page_view = PageView.objects.create(
+            visitor=visitor,
+            path='/blog/'
+        )
+        
+        payload = {
+            'page_view_id': page_view.id,
+            'duration_seconds': 20,
+            'scroll_depth': 45
+        }
+        
+        response = self.client.post(
+            reverse('track_heartbeat'),
+            data=payload,
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['status'], 'success')
+        
+        # Verify db
+        self.assertTrue(ReadDuration.objects.filter(page_view=page_view).exists())
+        duration_log = ReadDuration.objects.get(page_view=page_view)
+        self.assertEqual(duration_log.duration_seconds, 20)
+        self.assertEqual(duration_log.scroll_depth, 45)
+
+        # Send another update with higher stats and check if it updates correctly
+        payload_update = {
+            'page_view_id': page_view.id,
+            'duration_seconds': 30,
+            'scroll_depth': 60
+        }
+        
+        response_update = self.client.post(
+            reverse('track_heartbeat'),
+            data=payload_update,
+            content_type='application/json'
+        )
+        self.assertEqual(response_update.status_code, 200)
+        
+        duration_log.refresh_from_db()
+        self.assertEqual(duration_log.duration_seconds, 30)
+        self.assertEqual(duration_log.scroll_depth, 60)
+
+    def test_dashboard_callback_injects_data(self):
+        from .analytics import dashboard_callback
+        
+        context = {}
+        result = dashboard_callback(None, context)
+        
+        self.assertIn('active_users', result)
+        self.assertIn('total_visitors', result)
+        self.assertIn('total_page_views', result)
+        self.assertIn('chart_daily_labels', result)
+        self.assertIn('chart_daily_data', result)
+

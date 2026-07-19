@@ -53,6 +53,7 @@ CSRF_TRUSTED_ORIGINS = (
 # Application definition
 
 INSTALLED_APPS = [
+    'unfold',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -168,3 +169,13 @@ if not DEBUG:
 # where uploaded files (like skill icons) get saved on disk
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Django Unfold Configuration
+UNFOLD = {
+    "SITE_TITLE": "CollinsTechEmpire Analytics",
+    "SITE_HEADER": "CollinsTechEmpire Dashboard",
+    "THEME": "dark",
+    "DASHBOARD_CALLBACK": "main.analytics.dashboard_callback",
+    "SHOW_HISTORY": True,
+}
+
