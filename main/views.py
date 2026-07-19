@@ -19,6 +19,8 @@ from .models import (
     ToolkitItem,
     UserProfile,
     WorkSample,
+    BlogComment,
+    BlogReaction,
 )
 
 
@@ -324,11 +326,22 @@ def blog_list(request):
 def blog_detail(request, pk):
     post = get_object_or_404(BlogPost, pk=pk)
     related_posts = BlogPost.objects.filter(category=post.category).exclude(pk=post.pk)[:3]
-    return render(
-        request,
-        'main/blog_detail.html',
-        {'post': post, 'related_posts': related_posts},
-    )
+    comments = post.comments.filter(is_approved=True)
+    
+    reaction_counts = {
+        'like': post.reactions.filter(reaction_type='like').count(),
+        'love': post.reactions.filter(reaction_type='love').count(),
+        'clap': post.reactions.filter(reaction_type='clap').count(),
+        'insightful': post.reactions.filter(reaction_type='insightful').count(),
+    }
+    
+    context = {
+        'post': post,
+        'related_posts': related_posts,
+        'comments': comments,
+        'reaction_counts': reaction_counts,
+    }
+    return render(request, 'main/blog_detail.html', context)
 
 
 @staff_member_required
@@ -515,6 +528,65 @@ def track_heartbeat(request):
             read_log.save()
             
         return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+def add_blog_comment(request, post_id):
+    if request.method != 'POST':
+        return redirect('blog_list')
+    post = get_object_or_404(BlogPost, pk=post_id)
+    author_name = request.POST.get('author_name', '').strip()
+    author_email = request.POST.get('author_email', '').strip()
+    content = request.POST.get('content', '').strip()
+
+    if not author_name or not content:
+        messages.error(request, "Name and comment text are required fields.")
+        return redirect('blog_detail', pk=post.pk)
+
+    BlogComment.objects.create(
+        post=post,
+        author_name=author_name,
+        author_email=author_email or None,
+        content=content,
+        is_approved=True
+    )
+    messages.success(request, "Your comment was posted successfully!")
+    return redirect('blog_detail', pk=post.pk)
+
+
+@csrf_exempt
+def toggle_blog_reaction(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Only POST method allowed'}, status=405)
+    try:
+        data = json.loads(request.body)
+        post_id = data.get('post_id')
+        reaction_type = data.get('reaction_type')
+        session_id = data.get('session_id', '').strip()
+
+        if not post_id or not reaction_type or not session_id:
+            return JsonResponse({'status': 'error', 'message': 'Missing post_id, reaction_type or session_id'}, status=400)
+
+        if reaction_type not in ['like', 'love', 'clap', 'insightful']:
+            return JsonResponse({'status': 'error', 'message': 'Invalid reaction type'}, status=400)
+
+        post = get_object_or_404(BlogPost, pk=post_id)
+        
+        reaction_filter = BlogReaction.objects.filter(post=post, reaction_type=reaction_type, session_id=session_id)
+        if reaction_filter.exists():
+            reaction_filter.delete()
+            active = False
+        else:
+            BlogReaction.objects.create(post=post, reaction_type=reaction_type, session_id=session_id)
+            active = True
+
+        count = BlogReaction.objects.filter(post=post, reaction_type=reaction_type).count()
+        return JsonResponse({
+            'status': 'success',
+            'active': active,
+            'count': count
+        })
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 

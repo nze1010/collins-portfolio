@@ -491,3 +491,39 @@ class ReadDuration(models.Model):
     def __str__(self):
         return f"{self.duration_seconds}s read depth {self.scroll_depth}% for {self.page_view}"
 
+
+class BlogComment(models.Model):
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='comments')
+    author_name = models.CharField(max_length=100)
+    author_email = models.EmailField(blank=True, null=True)
+    content = models.TextField(max_length=1000)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"Comment by {self.author_name} on {self.post.title}"
+
+
+class BlogReaction(models.Model):
+    REACTION_CHOICES = [
+        ('like', 'Like'),
+        ('love', 'Love'),
+        ('clap', 'Clap'),
+        ('insightful', 'Insightful'),
+    ]
+
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='reactions')
+    reaction_type = models.CharField(max_length=20, choices=REACTION_CHOICES)
+    session_id = models.CharField(max_length=100, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('post', 'reaction_type', 'session_id')
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.reaction_type} by {self.session_id[:8]} on {self.post.title}"
+

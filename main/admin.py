@@ -18,6 +18,8 @@ from .models import (
     Visitor,
     PageView,
     ReadDuration,
+    BlogComment,
+    BlogReaction,
 )
 
 
@@ -210,3 +212,31 @@ class ReadDurationAdmin(ModelAdmin):
     def scroll_depth_formatted(self, obj):
         return f"{obj.scroll_depth}%"
     scroll_depth_formatted.short_description = "Scroll Depth"
+
+
+@admin.register(BlogComment)
+class BlogCommentAdmin(ModelAdmin):
+    list_display = ('author_name', 'post_title', 'created_at', 'is_approved')
+    list_filter = ('is_approved', 'created_at')
+    search_fields = ('author_name', 'author_email', 'content', 'post__title')
+    list_editable = ('is_approved',)
+
+    def post_title(self, obj):
+        return obj.post.title
+    post_title.short_description = "Blog Post"
+
+
+@admin.register(BlogReaction)
+class BlogReactionAdmin(ModelAdmin):
+    list_display = ('post_title', 'reaction_type', 'session_id_short', 'created_at')
+    list_filter = ('reaction_type', 'created_at')
+    search_fields = ('post__title', 'session_id')
+    readonly_fields = ('post', 'reaction_type', 'session_id', 'created_at')
+
+    def post_title(self, obj):
+        return obj.post.title
+    post_title.short_description = "Blog Post"
+
+    def session_id_short(self, obj):
+        return obj.session_id[:8]
+    session_id_short.short_description = "Visitor UUID"

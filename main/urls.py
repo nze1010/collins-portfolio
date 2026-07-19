@@ -18,4 +18,6 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('analytics/track-pageview/', views.track_pageview, name='track_pageview'),
     path('analytics/track-heartbeat/', views.track_heartbeat, name='track_heartbeat'),
+    path('blog/<int:post_id>/comment/', views.add_blog_comment, name='add_blog_comment'),
+    path('blog/reaction/', views.toggle_blog_reaction, name='toggle_blog_reaction'),
 ]

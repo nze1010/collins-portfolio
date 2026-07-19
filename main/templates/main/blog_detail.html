@@ -4,6 +4,9 @@
 {% block title %}{{ post.title }} | CollinsTechEmpire{% endblock %}
 
 {% block content %}
+<!-- Reading Progress Bar -->
+<div id="readingProgress" style="position: fixed; top: 0; left: 0; width: 0%; height: 4px; background: linear-gradient(90deg, #6366f1, #10b981); z-index: 9999; transition: width 0.05s ease-out;"></div>
+
 <article class="article-detail">
     <header class="article-detail-header">
         <div class="shell article-header-inner reveal">
@@ -18,10 +21,189 @@
     {% if post.cover_image %}<div class="shell article-cover reveal-card"><img src="{{ post.cover_image.url }}" alt="Cover image for {{ post.title }}"></div>{% endif %}
 
     <div class="shell article-layout">
-        <div class="article-body prose reveal">{{ post.content|linebreaks }}</div>
+        <div class="article-body prose reveal">
+            {{ post.content|linebreaks }}
+            
+            <!-- Reactions Bar -->
+            <div class="reactions-bar glass-card reveal-card" style="margin-top: 40px; padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); background: rgba(15,23,42,0.6); backdrop-filter: blur(12px); display: flex; flex-direction: column; gap: 12px;">
+                <span style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8;">How was this read? React:</span>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button type="button" class="reaction-btn" data-reaction="like" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; padding: 10px 16px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; outline: none;">
+                        👍 Like <span class="count" style="color: #64748b; font-size: 0.85rem; font-weight: 700;">{{ reaction_counts.like }}</span>
+                    </button>
+                    <button type="button" class="reaction-btn" data-reaction="love" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; padding: 10px 16px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; outline: none;">
+                        ❤️ Love <span class="count" style="color: #64748b; font-size: 0.85rem; font-weight: 700;">{{ reaction_counts.love }}</span>
+                    </button>
+                    <button type="button" class="reaction-btn" data-reaction="clap" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; padding: 10px 16px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; outline: none;">
+                        👏 Clap <span class="count" style="color: #64748b; font-size: 0.85rem; font-weight: 700;">{{ reaction_counts.clap }}</span>
+                    </button>
+                    <button type="button" class="reaction-btn" data-reaction="insightful" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; padding: 10px 16px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; outline: none;">
+                        💡 Insightful <span class="count" style="color: #64748b; font-size: 0.85rem; font-weight: 700;">{{ reaction_counts.insightful }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
         <aside class="share-panel glass-card reveal-card"><span>Share this insight</span><a target="_blank" rel="noopener" href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri|urlencode }}">LinkedIn</a><a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ post.title|urlencode }}">X / Twitter</a><button type="button" data-copy-url="{{ request.build_absolute_uri }}">Copy link</button></aside>
+    </div>
+
+    <!-- Comments & Discussion Section -->
+    <div class="shell reveal-card" style="margin-top: 40px; margin-bottom: 50px; max-width: 800px; padding: 0 20px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 12px;">
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #ffffff; margin: 0; font-family: inherit;">Discussion</h3>
+            <span style="font-size: 0.72rem; font-weight: 700; color: #818cf8; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); padding: 2px 8px; border-radius: 12px;">{{ comments|length }} comment{{ comments|length|pluralize }}</span>
+        </div>
+
+        <!-- Display existing comments -->
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px;">
+            {% for comment in comments %}
+                <div class="glass-card" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.01); display: flex; gap: 14px; align-items: flex-start;">
+                    <!-- Avatar -->
+                    <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #ffffff; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-transform: uppercase; font-family: inherit;">
+                        {{ comment.author_name|slice:":2" }}
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 10px; flex-wrap: wrap;">
+                            <strong style="font-size: 0.88rem; color: #cbd5e1;">{{ comment.author_name }}</strong>
+                            <span style="font-size: 0.68rem; color: #475569;">{{ comment.created_at|date:"F d, Y \a\t g:i a" }}</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.5; margin: 0; white-space: pre-wrap;">{{ comment.content }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <div style="text-align: center; padding: 40px 20px; color: #475569; border: 1px dashed rgba(255,255,255,0.05); border-radius: 16px;">
+                    💬 No comments yet. Be the first to share your thoughts!
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Add Comment Form -->
+        <div class="glass-card" style="padding: 24px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.06); background: rgba(15,23,42,0.4);">
+            <h4 style="font-size: 1rem; font-weight: 700; color: #ffffff; margin: 0 0 16px;">Add a comment</h4>
+            <form id="commentForm" method="POST" action="{% url 'add_blog_comment' post.id %}" style="display: flex; flex-direction: column; gap: 14px;">
+                {% csrf_token %}
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        <div style="padding: 10px 14px; border-radius: 8px; font-size: 0.76rem; font-weight: 600; {% if message.tags == 'error' %}background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2);{% else %}background: rgba(16,185,129,0.1); color: #34d399; border: 1px solid rgba(16,185,129,0.2);{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+                    <div>
+                        <label for="authorName" style="display: block; font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Name *</label>
+                        <input type="text" id="authorName" name="author_name" required style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 0.85rem; outline: none; transition: border-color 0.2s;" placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label for="authorEmail" style="display: block; font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Email (Optional)</label>
+                        <input type="email" id="authorEmail" name="author_email" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 0.85rem; outline: none; transition: border-color 0.2s;" placeholder="john@example.com">
+                    </div>
+                </div>
+                <div>
+                    <label for="commentContent" style="display: block; font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Comment *</label>
+                    <textarea id="commentContent" name="content" required rows="4" maxlength="1000" style="width: 100%; padding: 12px 14px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 0.85rem; outline: none; resize: vertical; min-height: 80px; transition: border-color 0.2s;" placeholder="Share your thoughts..."></textarea>
+                </div>
+                <div style="text-align: right;">
+                    <button type="submit" style="padding: 10px 20px; font-size: 0.76rem; font-weight: 700; border-radius: 10px; cursor: pointer; transition: all 0.2s; border: none; background: #4f46e5; color: #ffffff; outline: none;">Post Comment</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     {% if related_posts %}<section class="section-block section-tinted"><div class="shell"><div class="section-heading"><div><span class="eyebrow">Continue Reading</span><h2>Related <span>insights</span></h2></div></div><div class="article-grid">{% for post in related_posts %}{% include 'main/partials/blog_card.html' %}{% endfor %}</div></div></section>{% endif %}
 </article>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Reading Progress Bar
+    window.addEventListener("scroll", function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrollPercentage = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        document.getElementById("readingProgress").style.width = scrollPercentage + "%";
+    });
+
+    // Focus state animations for forms
+    const inputs = document.querySelectorAll("#commentForm input, #commentForm textarea");
+    inputs.forEach(input => {
+        input.addEventListener("focus", () => input.style.borderColor = "rgba(99, 102, 241, 0.4)");
+        input.addEventListener("blur", () => input.style.borderColor = "rgba(255, 255, 255, 0.06)");
+    });
+
+    // 2. AJAX Reactions Toggle
+    const reactionButtons = document.querySelectorAll(".reaction-btn");
+    
+    // Retrieve visitor UUID from localStorage
+    const visitorUuid = localStorage.getItem("portfolio_visitor_uuid") || "anonymous_session";
+    
+    // Check if user has active reactions in localStorage
+    const storageKey = "active_reactions_post_" + "{{ post.id }}";
+    let activeReactions = JSON.parse(localStorage.getItem(storageKey) || "{}");
+
+    // Apply active styles on load
+    reactionButtons.forEach(btn => {
+        const type = btn.getAttribute("data-reaction");
+        if (activeReactions[type]) {
+            setBtnActive(btn, true);
+        }
+    });
+
+    reactionButtons.forEach(btn => {
+        btn.addEventListener("click", function() {
+            const reactionType = this.getAttribute("data-reaction");
+            
+            // Visual feedback scale bounce
+            btn.style.transform = "scale(0.95)";
+            setTimeout(() => btn.style.transform = "scale(1)", 100);
+
+            // POST to reaction API
+            fetch("{% url 'toggle_blog_reaction' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({
+                    post_id: "{{ post.id }}",
+                    reaction_type: reactionType,
+                    session_id: visitorUuid
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    // Update reaction count text
+                    btn.querySelector(".count").textContent = data.count;
+                    
+                    // Toggle locally stored active state
+                    if (data.active) {
+                        activeReactions[reactionType] = true;
+                        setBtnActive(btn, true);
+                    } else {
+                        delete activeReactions[reactionType];
+                        setBtnActive(btn, false);
+                    }
+                    localStorage.setItem(storageKey, JSON.stringify(activeReactions));
+                }
+            })
+            .catch(err => console.error("Error toggling reaction:", err));
+        });
+    });
+
+    function setBtnActive(btn, isActive) {
+        if (isActive) {
+            btn.style.background = "rgba(99, 102, 241, 0.15)";
+            btn.style.borderColor = "rgba(99, 102, 241, 0.4)";
+            btn.style.color = "#818cf8";
+            btn.querySelector(".count").style.color = "#818cf8";
+        } else {
+            btn.style.background = "rgba(255, 255, 255, 0.03)";
+            btn.style.borderColor = "rgba(255, 255, 255, 0.05)";
+            btn.style.color = "#cbd5e1";
+            btn.querySelector(".count").style.color = "#64748b";
+        }
+    }
+});
+</script>
 {% endblock %}

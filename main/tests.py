@@ -14,6 +14,8 @@ from .models import (
     Skill,
     SocialLink,
     WorkSample,
+    BlogComment,
+    BlogReaction,
 )
 
 
@@ -512,4 +514,63 @@ class AnalyticsTests(TestCase):
         self.assertIn('total_page_views', result)
         self.assertIn('chart_daily_labels', result)
         self.assertIn('chart_daily_data', result)
+
+
+class BlogInteractiveTests(TestCase):
+    def setUp(self):
+        self.post = BlogPost.objects.create(
+            title='Interactive Test Post',
+            content='Testing comments and reactions.',
+            category='Tech'
+        )
+
+    def test_add_blog_comment(self):
+        payload = {
+            'author_name': 'Tester McTest',
+            'author_email': 'tester@example.com',
+            'content': 'This is a test comment.'
+        }
+        response = self.client.post(
+            reverse('add_blog_comment', kwargs={'post_id': self.post.id}),
+            data=payload
+        )
+        self.assertEqual(response.status_code, 302)
+        
+        self.assertTrue(BlogComment.objects.filter(post=self.post).exists())
+        comment = BlogComment.objects.get(post=self.post)
+        self.assertEqual(comment.author_name, 'Tester McTest')
+        self.assertEqual(comment.author_email, 'tester@example.com')
+        self.assertEqual(comment.content, 'This is a test comment.')
+        self.assertTrue(comment.is_approved)
+
+    def test_toggle_blog_reaction(self):
+        payload = {
+            'post_id': self.post.id,
+            'reaction_type': 'love',
+            'session_id': 'test-session-uuid-123'
+        }
+        response = self.client.post(
+            reverse('toggle_blog_reaction'),
+            data=payload,
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+        self.assertTrue(data['active'])
+        self.assertEqual(data['count'], 1)
+        
+        self.assertTrue(BlogReaction.objects.filter(post=self.post, reaction_type='love').exists())
+
+        response_off = self.client.post(
+            reverse('toggle_blog_reaction'),
+            data=payload,
+            content_type='application/json'
+        )
+        self.assertEqual(response_off.status_code, 200)
+        data_off = response_off.json()
+        self.assertFalse(data_off['active'])
+        self.assertEqual(data_off['count'], 0)
+        
+        self.assertFalse(BlogReaction.objects.filter(post=self.post, reaction_type='love').exists())
 
