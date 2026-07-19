@@ -90,15 +90,9 @@
                     {% endfor %}
                 {% endif %}
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
-                    <div>
-                        <label for="authorName" style="display: block; font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Name *</label>
-                        <input type="text" id="authorName" name="author_name" required style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 0.85rem; outline: none; transition: border-color 0.2s;" placeholder="John Doe">
-                    </div>
-                    <div>
-                        <label for="authorEmail" style="display: block; font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Email (Optional)</label>
-                        <input type="email" id="authorEmail" name="author_email" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 0.85rem; outline: none; transition: border-color 0.2s;" placeholder="john@example.com">
-                    </div>
+                <div>
+                    <label for="authorName" style="display: block; font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Name *</label>
+                    <input type="text" id="authorName" name="author_name" required style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); color: #f1f5f9; font-size: 0.85rem; outline: none; transition: border-color 0.2s;" placeholder="John Doe">
                 </div>
                 <div>
                     <label for="commentContent" style="display: block; font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Comment *</label>

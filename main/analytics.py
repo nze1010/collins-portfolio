@@ -6,7 +6,7 @@ from django.contrib.auth.models import User, Group
 from .models import (
     Visitor, PageView, ReadDuration, BlogPost, Project, Skill,
     Certification, ContactMessage, Service, WorkSample, SocialLink,
-    ToolkitItem, Organization, Experience
+    ToolkitItem, Organization, Experience, BlogComment, BlogReaction
 )
 
 def dashboard_callback(request, context):
@@ -104,6 +104,8 @@ def dashboard_callback(request, context):
         'chart_category_labels': chart_category_labels,
         'chart_category_data': chart_category_data,
         'popular_posts': formatted_popular_posts,
+        'total_comments': BlogComment.objects.count(),
+        'total_reactions': BlogReaction.objects.count(),
         
         # Model Counts for Control Panel Grid
         'count_blog_posts': BlogPost.objects.count(),

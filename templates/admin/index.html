@@ -119,15 +119,12 @@
     background: rgba(255, 255, 255, 0.06);
 }
 
-/* Analytics Stats Grid */
 .cte-stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 16px;
     margin-bottom: 24px;
 }
-@media (max-width: 1024px) { .cte-stats-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 640px) { .cte-stats-grid { grid-template-columns: 1fr; } }
 
 .cte-stat-card {
     background: #0f172a;
@@ -156,6 +153,8 @@
 .cte-stat-card--purple .cte-stat-icon { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
 .cte-stat-card--green  .cte-stat-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
 .cte-stat-card--orange .cte-stat-icon { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+.cte-stat-card--pink   .cte-stat-icon { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
+.cte-stat-card--cyan   .cte-stat-icon { background: rgba(6, 182, 212, 0.1); color: #06b6d4; }
 
 .cte-stat-label {
     font-size: 0.72rem;
@@ -176,6 +175,8 @@
 .cte-stat-card--purple .cte-stat-val { color: #c084fc; }
 .cte-stat-card--green  .cte-stat-val { color: #34d399; }
 .cte-stat-card--orange .cte-stat-val { color: #fdba74; }
+.cte-stat-card--pink   .cte-stat-val { color: #f472b6; }
+.cte-stat-card--cyan   .cte-stat-val { color: #22d3ee; }
 
 .cte-stat-desc {
     font-size: 0.7rem;
@@ -403,7 +404,26 @@
 </style>
 
 <div class="cte-dash">
-
+    
+    <!-- ── TOP ACTION NAVIGATION BAR ────────────────── -->
+    <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1px solid rgba(255,255,255,0.05); border-radius: 18px; padding: 12px 24px; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.25rem;">👑</span>
+            <span style="font-size: 0.85rem; font-weight: 700; color: #cbd5e1;">Welcome, {{ request.user.username }}</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="/admin/auth/user/add/" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: #818cf8; padding: 8px 16px; border-radius: 10px; font-size: 0.78rem; font-weight: 700; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.background='#4f46e5'; this.style.color='#ffffff'" onmouseout="this.style.background='rgba(99, 102, 241, 0.1)'; this.style.color='#818cf8'">
+                👤 Add Administrator
+            </a>
+            <form action="/admin/logout/" method="POST" style="margin: 0; display: inline;">
+                {% csrf_token %}
+                <button type="submit" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #f87171; padding: 8px 16px; border-radius: 10px; font-size: 0.78rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s;" onmouseover="this.style.background='#dc2626'; this.style.color='#ffffff'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.color='#f87171'">
+                    🚪 Logout
+                </button>
+            </form>
+        </div>
+    </div>
+ 
     <!-- ── 1. HERO REAL-TIME BANNER ────────────────── -->
     <div class="cte-hero">
         <div class="cte-hero-details">
@@ -418,7 +438,7 @@
             <span class="cte-live-lbl">🟢 Active Visitors</span>
         </div>
     </div>
-
+ 
     <!-- ── 2. KEY METRICS STAT CARDS ────────────────── -->
     <div class="cte-stats-grid">
         <div class="cte-stat-card cte-stat-card--blue">
@@ -427,21 +447,35 @@
             <p class="cte-stat-val">{{ total_visitors }}</p>
             <p class="cte-stat-desc">Distinct tracking sessions</p>
         </div>
-
+ 
         <div class="cte-stat-card cte-stat-card--purple">
             <div class="cte-stat-icon">📄</div>
-            <p class="cte-stat-label">Total Page Views</p>
+            <p class="cte-stat-label">Site Views / Clicks</p>
             <p class="cte-stat-val">{{ total_page_views }}</p>
-            <p class="cte-stat-desc">Accumulated across all pages</p>
+            <p class="cte-stat-desc">Accumulated pages and clicks</p>
         </div>
-
+ 
+        <div class="cte-stat-card cte-stat-card--pink">
+            <div class="cte-stat-icon">💬</div>
+            <p class="cte-stat-label">Total Comments</p>
+            <p class="cte-stat-val">{{ total_comments }}</p>
+            <p class="cte-stat-desc">Approved reader comments</p>
+        </div>
+ 
+        <div class="cte-stat-card cte-stat-card--cyan">
+            <div class="cte-stat-icon">❤️</div>
+            <p class="cte-stat-label">Likes & Reactions</p>
+            <p class="cte-stat-val">{{ total_reactions }}</p>
+            <p class="cte-stat-desc">Likes, claps, love, insights</p>
+        </div>
+ 
         <div class="cte-stat-card cte-stat-card--green">
             <div class="cte-stat-icon">⏱️</div>
             <p class="cte-stat-label">Avg Read Time</p>
             <p class="cte-stat-val">{{ avg_duration_min }}<span style="font-size:1.1rem">m</span></p>
             <p class="cte-stat-desc">Attention span per article</p>
         </div>
-
+ 
         <div class="cte-stat-card cte-stat-card--orange">
             <div class="cte-stat-icon">📜</div>
             <p class="cte-stat-label">Avg Scroll Depth</p>
@@ -755,105 +789,204 @@
         </div>
     </div>
 
-    <!-- ── 7. CONTROL CENTER - INTELLIGENCE LOGS ── -->
-    <div class="cte-section-title">
-        <span>🛡️ Security, Access &amp; Traffic Logs</span>
+    <!-- ── 7. MONITORING HUB — Collapsible accordion ── -->
+    <div class="cte-section-title" style="cursor: pointer; user-select: none;" onclick="document.getElementById('monitoringHub').classList.toggle('mon-open')">
+        <span>📊 Monitoring &amp; Intelligence Hub</span>
+        <span id="monToggleIcon" style="font-size: 0.75rem; color: #64748b; margin-left: auto; padding-right: 4px; flex-shrink: 0; transition: transform 0.3s;">▼ Expand</span>
     </div>
-    <div class="cte-control-grid">
-        <!-- Contact Messages -->
-        <div class="cte-control-card">
-            <div class="cte-cc-top">
-                <div class="cte-cc-icon-wrap">✉️</div>
-                <div class="cte-cc-count">{{ count_messages }}</div>
-            </div>
+
+    <!-- Summary badges shown when collapsed -->
+    <div id="monitoringSummary" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="document.getElementById('monitoringHub').classList.toggle('mon-open')">
+            <span style="font-size: 1.1rem;">📬</span>
             <div>
-                <div class="cte-cc-name">Contact Messages</div>
-                <div class="cte-cc-desc">View lead enquiries, job notifications, consultancy details, and inbox notes.</div>
-            </div>
-            <div class="cte-cc-actions">
-                <a href="/admin/main/contactmessage/" class="cte-cc-btn cte-cc-btn--primary" style="width: 100%; flex: none;">Read Inbox Messages</a>
+                <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Inbox</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #f1f5f9;">{{ count_messages }}</div>
             </div>
         </div>
-
-        <!-- Visitors Log -->
-        <div class="cte-control-card">
-            <div class="cte-cc-top">
-                <div class="cte-cc-icon-wrap">👥</div>
-                <div class="cte-cc-count">{{ total_visitors }}</div>
-            </div>
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="document.getElementById('monitoringHub').classList.toggle('mon-open')">
+            <span style="font-size: 1.1rem;">👥</span>
             <div>
-                <div class="cte-cc-name">Visitors Log</div>
-                <div class="cte-cc-desc">View unique visitor lists, parsed IP addresses, system operating models, and geolocation data.</div>
-            </div>
-            <div class="cte-cc-actions">
-                <a href="/admin/main/visitor/" class="cte-cc-btn cte-cc-btn--secondary" style="width: 100%; flex: none;">View Geolocation Logs</a>
+                <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Visitors</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #60a5fa;">{{ total_visitors }}</div>
             </div>
         </div>
-
-        <!-- Page Views Log -->
-        <div class="cte-control-card">
-            <div class="cte-cc-top">
-                <div class="cte-cc-icon-wrap">📄</div>
-                <div class="cte-cc-count">{{ total_page_views }}</div>
-            </div>
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="document.getElementById('monitoringHub').classList.toggle('mon-open')">
+            <span style="font-size: 1.1rem;">📄</span>
             <div>
-                <div class="cte-cc-name">Page Views Log</div>
-                <div class="cte-cc-desc">Monitor paths, traffic sources (referrals), and complete view timestamps.</div>
-            </div>
-            <div class="cte-cc-actions">
-                <a href="/admin/main/pageview/" class="cte-cc-btn cte-cc-btn--secondary" style="width: 100%; flex: none;">View Page Views History</a>
+                <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Site Clicks</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #c084fc;">{{ total_page_views }}</div>
             </div>
         </div>
-
-        <!-- Read Durations Log -->
-        <div class="cte-control-card">
-            <div class="cte-cc-top">
-                <div class="cte-cc-icon-wrap">⏱️</div>
-                <div class="cte-cc-count">Log</div>
-            </div>
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="document.getElementById('monitoringHub').classList.toggle('mon-open')">
+            <span style="font-size: 1.1rem;">💬</span>
             <div>
-                <div class="cte-cc-name">Read Durations</div>
-                <div class="cte-cc-desc">Review scroll percentages and real-time read heartbeat logs of visitors.</div>
-            </div>
-            <div class="cte-cc-actions">
-                <a href="/admin/main/readduration/" class="cte-cc-btn cte-cc-btn--secondary" style="width: 100%; flex: none;">View Heartbeat Records</a>
+                <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Comments</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #f472b6;">{{ total_comments }}</div>
             </div>
         </div>
-
-        <!-- Auth Users -->
-        <div class="cte-control-card">
-            <div class="cte-cc-top">
-                <div class="cte-cc-icon-wrap">🛡️</div>
-                <div class="cte-cc-count">{{ count_users }}</div>
-            </div>
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="document.getElementById('monitoringHub').classList.toggle('mon-open')">
+            <span style="font-size: 1.1rem;">❤️</span>
             <div>
-                <div class="cte-cc-name">Administrators</div>
-                <div class="cte-cc-desc">Manage dashboard user credentials, login passwords, and editor permissions.</div>
-            </div>
-            <div class="cte-cc-actions">
-                <a href="/admin/auth/user/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
-                <a href="/admin/auth/user/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Admin</a>
+                <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Reactions</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #22d3ee;">{{ total_reactions }}</div>
             </div>
         </div>
-
-        <!-- Auth Groups -->
-        <div class="cte-control-card">
-            <div class="cte-cc-top">
-                <div class="cte-cc-icon-wrap">🔒</div>
-                <div class="cte-cc-count">{{ count_groups }}</div>
-            </div>
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="document.getElementById('monitoringHub').classList.toggle('mon-open')">
+            <span style="font-size: 1.1rem;">🛡️</span>
             <div>
-                <div class="cte-cc-name">Group Roles</div>
-                <div class="cte-cc-desc">Manage system roles and fine-grained authorization permission groups.</div>
+                <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Admins</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #34d399;">{{ count_users }}</div>
             </div>
-            <div class="cte-cc-actions">
-                <a href="/admin/auth/group/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
-                <a href="/admin/auth/group/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Group</a>
+        </div>
+    </div>
+
+    <!-- Expanded full monitoring cards grid (hidden by default) -->
+    <div id="monitoringHub" style="overflow: hidden; max-height: 0; transition: max-height 0.45s ease; margin-bottom: 0;">
+        <div class="cte-control-grid" style="padding-top: 4px; margin-bottom: 24px;">
+
+            <!-- Contact Messages -->
+            <div class="cte-control-card">
+                <div class="cte-cc-top">
+                    <div class="cte-cc-icon-wrap">✉️</div>
+                    <div class="cte-cc-count">{{ count_messages }}</div>
+                </div>
+                <div>
+                    <div class="cte-cc-name">Contact Messages</div>
+                    <div class="cte-cc-desc">View lead enquiries, job notifications, consultancy details, and inbox notes.</div>
+                </div>
+                <div class="cte-cc-actions">
+                    <a href="/admin/main/contactmessage/" class="cte-cc-btn cte-cc-btn--primary" style="width: 100%; flex: none;">Read Inbox Messages</a>
+                </div>
+            </div>
+
+            <!-- Visitors Log -->
+            <div class="cte-control-card">
+                <div class="cte-cc-top">
+                    <div class="cte-cc-icon-wrap">👥</div>
+                    <div class="cte-cc-count">{{ total_visitors }}</div>
+                </div>
+                <div>
+                    <div class="cte-cc-name">Visitors Log</div>
+                    <div class="cte-cc-desc">View unique visitor lists, parsed IP addresses, device types, and geolocation data.</div>
+                </div>
+                <div class="cte-cc-actions">
+                    <a href="/admin/main/visitor/" class="cte-cc-btn cte-cc-btn--secondary" style="width: 100%; flex: none;">View Geolocation Logs</a>
+                </div>
+            </div>
+
+            <!-- Site Clicks / Page Views -->
+            <div class="cte-control-card">
+                <div class="cte-cc-top">
+                    <div class="cte-cc-icon-wrap">📄</div>
+                    <div class="cte-cc-count">{{ total_page_views }}</div>
+                </div>
+                <div>
+                    <div class="cte-cc-name">Site Clicks &amp; Page Views</div>
+                    <div class="cte-cc-desc">Monitor paths, traffic sources, referrals, and complete view timestamps.</div>
+                </div>
+                <div class="cte-cc-actions">
+                    <a href="/admin/main/pageview/" class="cte-cc-btn cte-cc-btn--secondary" style="width: 100%; flex: none;">View Page Views History</a>
+                </div>
+            </div>
+
+            <!-- Reader Comments -->
+            <div class="cte-control-card">
+                <div class="cte-cc-top">
+                    <div class="cte-cc-icon-wrap">💬</div>
+                    <div class="cte-cc-count">{{ total_comments }}</div>
+                </div>
+                <div>
+                    <div class="cte-cc-name">Blog Comments</div>
+                    <div class="cte-cc-desc">Read, approve, or moderate visitor comments left on your blog posts.</div>
+                </div>
+                <div class="cte-cc-actions">
+                    <a href="/admin/main/blogcomment/" class="cte-cc-btn cte-cc-btn--primary" style="width: 100%; flex: none;">View All Comments</a>
+                </div>
+            </div>
+
+            <!-- Reactions Log -->
+            <div class="cte-control-card">
+                <div class="cte-cc-top">
+                    <div class="cte-cc-icon-wrap">❤️</div>
+                    <div class="cte-cc-count">{{ total_reactions }}</div>
+                </div>
+                <div>
+                    <div class="cte-cc-name">Likes &amp; Reactions</div>
+                    <div class="cte-cc-desc">View total likes, love, claps, and insightful reactions on blog posts by visitors.</div>
+                </div>
+                <div class="cte-cc-actions">
+                    <a href="/admin/main/blogreaction/" class="cte-cc-btn cte-cc-btn--secondary" style="width: 100%; flex: none;">View Reaction Logs</a>
+                </div>
+            </div>
+
+            <!-- Read Durations Log -->
+            <div class="cte-control-card">
+                <div class="cte-cc-top">
+                    <div class="cte-cc-icon-wrap">⏱️</div>
+                    <div class="cte-cc-count">Log</div>
+                </div>
+                <div>
+                    <div class="cte-cc-name">Read Durations</div>
+                    <div class="cte-cc-desc">Review scroll percentages and real-time read heartbeat logs of visitors.</div>
+                </div>
+                <div class="cte-cc-actions">
+                    <a href="/admin/main/readduration/" class="cte-cc-btn cte-cc-btn--secondary" style="width: 100%; flex: none;">View Heartbeat Records</a>
+                </div>
+            </div>
+
+            <!-- Auth Users -->
+            <div class="cte-control-card">
+                <div class="cte-cc-top">
+                    <div class="cte-cc-icon-wrap">🛡️</div>
+                    <div class="cte-cc-count">{{ count_users }}</div>
+                </div>
+                <div>
+                    <div class="cte-cc-name">Administrators</div>
+                    <div class="cte-cc-desc">Manage dashboard user credentials, login passwords, and editor permissions.</div>
+                </div>
+                <div class="cte-cc-actions">
+                    <a href="/admin/auth/user/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                    <a href="/admin/auth/user/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Admin</a>
+                </div>
+            </div>
+
+            <!-- Auth Groups -->
+            <div class="cte-control-card">
+                <div class="cte-cc-top">
+                    <div class="cte-cc-icon-wrap">🔒</div>
+                    <div class="cte-cc-count">{{ count_groups }}</div>
+                </div>
+                <div>
+                    <div class="cte-cc-name">Group Roles</div>
+                    <div class="cte-cc-desc">Manage system roles and fine-grained authorization permission groups.</div>
+                </div>
+                <div class="cte-cc-actions">
+                    <a href="/admin/auth/group/" class="cte-cc-btn cte-cc-btn--secondary">View List</a>
+                    <a href="/admin/auth/group/add/" class="cte-cc-btn cte-cc-btn--primary">+ Add Group</a>
+                </div>
             </div>
         </div>
     </div>
 
 </div>
+
+<style>
+#monitoringHub.mon-open { max-height: 1200px !important; }
+</style>
+
+<script>
+// Sync toggle icon text
+document.querySelector('[onclick*="monitoringHub"]').addEventListener('click', function() {
+    var hub = document.getElementById('monitoringHub');
+    var icon = document.getElementById('monToggleIcon');
+    if (hub.classList.contains('mon-open')) {
+        icon.textContent = '▲ Collapse';
+    } else {
+        icon.textContent = '▼ Expand';
+    }
+});
+</script>
 
 <!-- Chart.js and Custom Dashboard Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
