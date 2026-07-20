@@ -452,6 +452,7 @@ class Visitor(models.Model):
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.TextField(null=True, blank=True)
     device_type = models.CharField(max_length=20, default='Unknown')
+    device_brand = models.CharField(max_length=50, default='Unknown')  # e.g. Samsung, Infinix, Apple
     browser = models.CharField(max_length=50, default='Unknown')
     country = models.CharField(max_length=100, default='Unknown')
     region = models.CharField(max_length=100, default='Unknown')
@@ -462,7 +463,7 @@ class Visitor(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Visitor {self.session_key[:8]} ({self.country}, {self.device_type})"
+        return f"Visitor {self.session_key[:8]} ({self.country}, {self.device_brand or self.device_type})"
 
 
 class PageView(models.Model):

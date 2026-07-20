@@ -14,7 +14,7 @@
         localStorage.setItem('cte_visitor_uuid', visitorUuid);
     }
 
-    // Detect browser & device type
+    // Detect device type (Mobile / Tablet / Desktop)
     function detectDevice() {
         const ua = navigator.userAgent;
         if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
@@ -26,12 +26,43 @@
         return 'Desktop';
     }
 
+    // Detect phone/tablet brand (Infinix, Samsung, Apple, Tecno, Itel, etc.)
+    function detectBrand() {
+        const ua = navigator.userAgent;
+        // African / popular global brands
+        if (/Infinix/i.test(ua))          return 'Infinix';
+        if (/TECNO/i.test(ua))            return 'Tecno';
+        if (/itel/i.test(ua))             return 'Itel';
+        if (/Oukitel/i.test(ua))          return 'Oukitel';
+        if (/Itel/i.test(ua))             return 'Itel';
+        // Global brands
+        if (/iPhone|iPad|iPod/i.test(ua)) return 'Apple';
+        if (/Samsung/i.test(ua))          return 'Samsung';
+        if (/Huawei|HUAWEI/i.test(ua))   return 'Huawei';
+        if (/Xiaomi|Redmi|POCO/i.test(ua)) return 'Xiaomi';
+        if (/OnePlus/i.test(ua))          return 'OnePlus';
+        if (/Oppo|OPPO/i.test(ua))       return 'Oppo';
+        if (/Vivo|vivo/i.test(ua))        return 'Vivo';
+        if (/Realme/i.test(ua))           return 'Realme';
+        if (/Nokia/i.test(ua))            return 'Nokia';
+        if (/Motorola|moto/i.test(ua))    return 'Motorola';
+        if (/LG/i.test(ua))              return 'LG';
+        if (/Sony/i.test(ua))            return 'Sony';
+        if (/HTC/i.test(ua))             return 'HTC';
+        if (/BlackBerry|BB10/i.test(ua)) return 'BlackBerry';
+        if (/Windows Phone/i.test(ua))   return 'Windows Phone';
+        // Fallback to device type
+        const dtype = detectDevice();
+        return dtype === 'Desktop' ? 'Desktop/PC' : 'Unknown Mobile';
+    }
+
     function detectBrowser() {
         const ua = navigator.userAgent;
         if (ua.includes("Chrome") && !ua.includes("Chromium") && !ua.includes("Edg")) return "Chrome";
         if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
         if (ua.includes("Firefox")) return "Firefox";
         if (ua.includes("Edg")) return "Edge";
+        if (ua.includes("OPR") || ua.includes("Opera")) return "Opera";
         return "Unknown";
     }
 
@@ -71,6 +102,7 @@
             referrer: referrer,
             blog_post_id: blogPostId,
             device_type: detectDevice(),
+            device_brand: detectBrand(),
             browser: detectBrowser(),
             country: locationData.country_name || 'Unknown',
             region: locationData.region || 'Unknown',

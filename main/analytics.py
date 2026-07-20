@@ -1,7 +1,7 @@
 import datetime
 from django.utils import timezone
 from django.db.models import Count, Avg
-from django.db.models.functions import TruncDay
+from django.db.models.functions import TruncDay, ExtractHour
 from django.contrib.auth.models import User, Group
 from .models import (
     Visitor, PageView, ReadDuration, BlogPost, Project, Skill,
@@ -49,7 +49,7 @@ def dashboard_callback(request, context):
         chart_daily_labels.append(d.strftime('%b %d'))
         chart_daily_data.append(day_map[d])
 
-    # 4. Chart 2: Device breakdown (Mobile vs Desktop vs Tablet)
+    # 4. Chart 2: Device type breakdown (Mobile vs Desktop vs Tablet)
     device_data = Visitor.objects.values('device_type').annotate(count=Count('id'))
     chart_device_labels = []
     chart_device_data = []
@@ -90,6 +90,52 @@ def dashboard_callback(request, context):
             'avg_scroll': f"{round(raw_scroll)}%"
         })
 
+    # 7. NEW: Phone brand breakdown (Samsung, Infinix, Apple, Tecno, Itel...)
+    brand_data = Visitor.objects.values('device_brand') \
+        .annotate(count=Count('id')) \
+        .order_by('-count')[:10]
+    chart_brand_labels = []
+    chart_brand_data = []
+    for item in brand_data:
+        chart_brand_labels.append(item['device_brand'] or 'Unknown')
+        chart_brand_data.append(item['count'])
+
+    # 8. NEW: Peak hours chart (what hours of the day get most traffic)
+    hour_data = PageView.objects.annotate(hour=ExtractHour('viewed_at')) \
+        .values('hour') \
+        .annotate(count=Count('id')) \
+        .order_by('hour')
+    hour_map = {h: 0 for h in range(24)}
+    for item in hour_data:
+        hour_map[item['hour']] = item['count']
+    chart_hour_labels = [f"{h:02d}:00" for h in range(24)]
+    chart_hour_data = [hour_map[h] for h in range(24)]
+
+    # 9. NEW: Top countries
+    top_countries = Visitor.objects.exclude(country='Unknown') \
+        .values('country') \
+        .annotate(count=Count('id')) \
+        .order_by('-count')[:8]
+    chart_country_labels = [c['country'] for c in top_countries]
+    chart_country_data = [c['count'] for c in top_countries]
+
+    # 10. NEW: Top referrers (traffic sources)
+    top_referrers = PageView.objects.exclude(referrer='') \
+        .exclude(referrer__isnull=True) \
+        .values('referrer') \
+        .annotate(count=Count('id')) \
+        .order_by('-count')[:5]
+    formatted_referrers = []
+    for ref in top_referrers:
+        raw = ref['referrer'] or ''
+        # Shorten long referrer URLs to just the domain
+        try:
+            from urllib.parse import urlparse
+            domain = urlparse(raw).netloc or raw[:40]
+        except Exception:
+            domain = raw[:40]
+        formatted_referrers.append({'source': domain, 'count': ref['count']})
+
     # Update context dictionary with our custom fields
     context.update({
         'active_users': active_page_views,
@@ -97,16 +143,31 @@ def dashboard_callback(request, context):
         'total_page_views': total_page_views,
         'avg_duration_min': round(avg_duration / 60, 1) if avg_duration else 0,
         'avg_scroll_percent': round(avg_scroll) if avg_scroll else 0,
+        # Daily views chart
         'chart_daily_labels': chart_daily_labels,
         'chart_daily_data': chart_daily_data,
+        # Device type chart
         'chart_device_labels': chart_device_labels,
         'chart_device_data': chart_device_data,
+        # Blog category chart
         'chart_category_labels': chart_category_labels,
         'chart_category_data': chart_category_data,
+        # Popular posts table
         'popular_posts': formatted_popular_posts,
+        # Comments & Reactions counts
         'total_comments': BlogComment.objects.count(),
         'total_reactions': BlogReaction.objects.count(),
-        
+        # NEW: Phone brand chart
+        'chart_brand_labels': chart_brand_labels,
+        'chart_brand_data': chart_brand_data,
+        # NEW: Peak hours chart
+        'chart_hour_labels': chart_hour_labels,
+        'chart_hour_data': chart_hour_data,
+        # NEW: Top countries chart
+        'chart_country_labels': chart_country_labels,
+        'chart_country_data': chart_country_data,
+        # NEW: Top referrers
+        'top_referrers': formatted_referrers,
         # Model Counts for Control Panel Grid
         'count_blog_posts': BlogPost.objects.count(),
         'count_projects': Project.objects.count(),

@@ -432,6 +432,7 @@ def track_pageview(request):
         
         # Device information from front-end data
         device_type = data.get('device_type', 'Unknown')
+        device_brand = data.get('device_brand', 'Unknown')
         browser = data.get('browser', 'Unknown')
         
         # Location information from front-end lookup
@@ -448,6 +449,7 @@ def track_pageview(request):
                 'ip_address': ip_address,
                 'user_agent': user_agent,
                 'device_type': device_type,
+                'device_brand': device_brand,
                 'browser': browser,
                 'country': country,
                 'region': region,
@@ -462,6 +464,9 @@ def track_pageview(request):
             updated = True
         if visitor.user_agent != user_agent and user_agent:
             visitor.user_agent = user_agent
+            updated = True
+        if device_brand != 'Unknown' and visitor.device_brand == 'Unknown':
+            visitor.device_brand = device_brand
             updated = True
         if country != 'Unknown' and visitor.country == 'Unknown':
             visitor.country = country
