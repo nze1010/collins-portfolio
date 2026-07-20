@@ -22,4 +22,5 @@ urlpatterns = [
     path('blog/reaction/', views.toggle_blog_reaction, name='toggle_blog_reaction'),
     path('robots.txt', views.robots_txt, name='robots_txt'),
     path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
+    path('googlec7c7839aa7abdf9c.html', views.google_verify, name='google_verify'),
 ]

@@ -630,3 +630,8 @@ def sitemap_xml(request):
     return HttpResponse(xml_content, content_type="application/xml")
 
 
+def google_verify(request):
+    return HttpResponse("google-site-verification: googlec7c7839aa7abdf9c.html", content_type="text/plain")
+
+
+

@@ -592,4 +592,11 @@ class SEORouteTests(TestCase):
         self.assertIn('<urlset', content)
         self.assertIn('<loc>', content)
 
+    def test_google_verify(self):
+        response = self.client.get(reverse('google_verify'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/plain')
+        self.assertIn('google-site-verification:', response.content.decode())
+
+
 
