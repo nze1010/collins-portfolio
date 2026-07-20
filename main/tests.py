@@ -574,3 +574,22 @@ class BlogInteractiveTests(TestCase):
         
         self.assertFalse(BlogReaction.objects.filter(post=self.post, reaction_type='love').exists())
 
+
+class SEORouteTests(TestCase):
+    def test_robots_txt(self):
+        response = self.client.get(reverse('robots_txt'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/plain')
+        self.assertIn('User-agent: *', response.content.decode())
+        self.assertIn('Sitemap:', response.content.decode())
+
+    def test_sitemap_xml(self):
+        response = self.client.get(reverse('sitemap_xml'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/xml')
+        content = response.content.decode()
+        self.assertIn('<?xml version="1.0" encoding="UTF-8"?>', content)
+        self.assertIn('<urlset', content)
+        self.assertIn('<loc>', content)
+
+

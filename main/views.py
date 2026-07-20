@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 import json
 
 from .forms import BlogPostForm, ContactForm
@@ -589,4 +589,44 @@ def toggle_blog_reaction(request):
         })
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+def robots_txt(request):
+    sitemap_url = request.build_absolute_uri(reverse('sitemap_xml'))
+    content = f"User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /analytics/\n\nSitemap: {sitemap_url}\n"
+    return HttpResponse(content, content_type="text/plain")
+
+
+def sitemap_xml(request):
+    urls = []
+    
+    # Static main views
+    static_views = ['home', 'skill_list', 'journey', 'project_list', 'blog_list', 'contact', 'site_search']
+    for view in static_views:
+        try:
+            urls.append(request.build_absolute_uri(reverse(view)))
+        except Exception:
+            pass
+        
+    # Project detail pages
+    for project in Project.objects.all():
+        try:
+            urls.append(request.build_absolute_uri(reverse('project_detail', kwargs={'slug': project.slug})))
+        except Exception:
+            pass
+        
+    # Blog detail pages
+    for post in BlogPost.objects.all():
+        try:
+            urls.append(request.build_absolute_uri(reverse('blog_detail', kwargs={'pk': post.pk})))
+        except Exception:
+            pass
+        
+    xml_items = []
+    for url in urls:
+        xml_items.append(f"  <url>\n    <loc>{url}</loc>\n    <changefreq>weekly</changefreq>\n  </url>")
+        
+    xml_content = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(xml_items) + '\n</urlset>\n'
+    return HttpResponse(xml_content, content_type="application/xml")
+
 

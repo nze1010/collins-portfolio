@@ -20,4 +20,6 @@ urlpatterns = [
     path('analytics/track-heartbeat/', views.track_heartbeat, name='track_heartbeat'),
     path('blog/<int:post_id>/comment/', views.add_blog_comment, name='add_blog_comment'),
     path('blog/reaction/', views.toggle_blog_reaction, name='toggle_blog_reaction'),
+    path('robots.txt', views.robots_txt, name='robots_txt'),
+    path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
 ]
